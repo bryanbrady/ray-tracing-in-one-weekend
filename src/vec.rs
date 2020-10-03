@@ -94,6 +94,12 @@ impl Vec3 {
         }
     }
 
+    #[allow(dead_code)]
+    pub fn unit_vector(self) -> Vec3 {
+        let len = self.length();
+        self / len
+    }
+
 }
 
 #[cfg(test)]
