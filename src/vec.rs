@@ -7,7 +7,33 @@ pub struct Vec3 {
     pub z: f64
 }
 
+// TODO: Learn how to use macros
+
 impl ops::Add<Vec3> for Vec3 {
+    type Output = Vec3;
+
+    fn add(self, _rhs: Vec3) -> Self::Output {
+        Vec3 {
+            x: self.x + _rhs.x,
+            y: self.y + _rhs.y,
+            z: self.z + _rhs.z
+        }
+    }
+}
+
+impl ops::Add<&Vec3> for Vec3 {
+    type Output = Vec3;
+
+    fn add(self, _rhs: &Vec3) -> Self::Output {
+        Vec3 {
+            x: self.x + _rhs.x,
+            y: self.y + _rhs.y,
+            z: self.z + _rhs.z
+        }
+    }
+}
+
+impl ops::Add<Vec3> for &Vec3 {
     type Output = Vec3;
 
     fn add(self, _rhs: Vec3) -> Self::Output {
@@ -36,6 +62,18 @@ impl ops::Sub<Vec3> for Vec3 {
     type Output = Vec3;
 
     fn sub(self, _rhs: Vec3) -> Self::Output {
+        Vec3 {
+            x: self.x - _rhs.x,
+            y: self.y - _rhs.y,
+            z: self.z - _rhs.z
+        }
+    }
+}
+
+impl ops::Sub<&Vec3> for Vec3 {
+    type Output = Vec3;
+
+    fn sub(self, _rhs: &Vec3) -> Self::Output {
         Vec3 {
             x: self.x - _rhs.x,
             y: self.y - _rhs.y,
