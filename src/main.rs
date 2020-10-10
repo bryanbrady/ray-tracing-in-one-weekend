@@ -2,16 +2,22 @@
 use std::io::{self};
 
 mod color;
-mod vec;
+use color::Color;
+use color::write_color;
+
 mod ray;
+use ray::Ray;
+
+mod vec;
+use vec::Vec3;
 
 
 #[allow(dead_code)]
 fn ray_color(_ray : ray::Ray) -> color::Color {
     let unit = _ray.direction.unit_vector();
     let t = 0.5 * (unit.y + 1.0);
-    let c = vec::Vec3{x: 1.0, y: 1.0, z: 1.0} * (1.0-t) + vec::Vec3{x: 0.5, y: 0.7, z: 1.0} * t;
-    color::Color{ r: c.x, g: c.y, b: c.z }
+    let c = Vec3{x: 1.0, y: 1.0, z: 1.0} * (1.0-t) + Vec3{x: 0.5, y: 0.7, z: 1.0} * t;
+    Color{ r: c.x, g: c.y, b: c.z }
 }
 
 
@@ -27,12 +33,12 @@ fn main() -> io::Result<()> {
     const VIEWPORT_WIDTH: f64 = ASPECT_RATIO * VIEWPORT_HEIGHT;
     const FOCAL_LENGTH: f64 = 1.0;
 
-    const ORIG: vec::Vec3 = vec::Vec3{x: 0.0, y: 0.0, z: 0.0};
-    const HORIZONTAL: vec::Vec3  = vec::Vec3{x: VIEWPORT_WIDTH, y: 0.0, z: 0.0};
-    const VERTICAL: vec::Vec3  = vec::Vec3{x: 0.0, y: VIEWPORT_HEIGHT, z: 0.0};
+    const ORIG: Vec3 = Vec3{x: 0.0, y: 0.0, z: 0.0};
+    const HORIZONTAL: Vec3  = Vec3{x: VIEWPORT_WIDTH, y: 0.0, z: 0.0};
+    const VERTICAL: Vec3  = Vec3{x: 0.0, y: VIEWPORT_HEIGHT, z: 0.0};
     let lower_left = ORIG - HORIZONTAL/2.0
                    - VERTICAL/2.0
-                   - vec::Vec3{x: 0.0, y: 0.0, z: FOCAL_LENGTH};
+                   - Vec3{x: 0.0, y: 0.0, z: FOCAL_LENGTH};
 
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
     for h in  (0..IMAGE_HEIGHT).rev() {
@@ -40,11 +46,11 @@ fn main() -> io::Result<()> {
         for w in 0..IMAGE_WIDTH {
             let u = (w as f64) / ((IMAGE_WIDTH-1) as f64);
             let v = (h as f64) / ((IMAGE_HEIGHT-1) as f64);
-            let r = ray::Ray{
+            let r = Ray{
                 origin: ORIG,
                 direction: &lower_left + HORIZONTAL*u + VERTICAL*v - ORIG
             };
-            color::write_color(&mut io::stdout(), ray_color(r))?;
+            write_color(&mut io::stdout(), ray_color(r))?;
         }
     }
     eprintln!("Done!\n");
