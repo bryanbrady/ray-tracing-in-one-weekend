@@ -13,7 +13,20 @@ use vec::Vec3;
 
 
 #[allow(dead_code)]
-fn ray_color(_ray : ray::Ray) -> color::Color {
+fn hit_sphere(center: Vec3, radius: f64, r : Ray) -> bool {
+    let oc = r.origin - center;
+    let a = r.direction.dot(r.direction);
+    let b = 2.0 * oc.dot(r.direction);
+    let c = oc.dot(oc) - radius*radius;
+    let discriminant = b*b - 4.0*a*c;
+    return discriminant > 0.0
+}
+
+#[allow(dead_code)]
+fn ray_color(_ray : Ray) -> Color {
+    if hit_sphere(Vec3{x: 0.0, y: 0.0, z: -1.0}, 0.5, _ray) {
+        return Color{ r: 1.0, g: 0.0, b: 0.0 }
+    }
     let unit = _ray.direction.unit_vector();
     let t = 0.5 * (unit.y + 1.0);
     let c = Vec3{x: 1.0, y: 1.0, z: 1.0} * (1.0-t) + Vec3{x: 0.5, y: 0.7, z: 1.0} * t;
