@@ -1,6 +1,6 @@
 use std::ops;
 
-#[derive(Debug)]
+#[derive(Debug,Clone,Copy)]
 pub struct Vec3 {
     pub x: f64,
     pub y: f64,
@@ -8,23 +8,12 @@ pub struct Vec3 {
 }
 
 // TODO: Learn how to use macros
+// TODO: and if they're needed when Debug,Clone,Copy is used
 
 impl ops::Add<Vec3> for Vec3 {
     type Output = Vec3;
 
     fn add(self, _rhs: Vec3) -> Self::Output {
-        Vec3 {
-            x: self.x + _rhs.x,
-            y: self.y + _rhs.y,
-            z: self.z + _rhs.z
-        }
-    }
-}
-
-impl ops::Add<&Vec3> for Vec3 {
-    type Output = Vec3;
-
-    fn add(self, _rhs: &Vec3) -> Self::Output {
         Vec3 {
             x: self.x + _rhs.x,
             y: self.y + _rhs.y,
@@ -62,18 +51,6 @@ impl ops::Sub<Vec3> for Vec3 {
     type Output = Vec3;
 
     fn sub(self, _rhs: Vec3) -> Self::Output {
-        Vec3 {
-            x: self.x - _rhs.x,
-            y: self.y - _rhs.y,
-            z: self.z - _rhs.z
-        }
-    }
-}
-
-impl ops::Sub<&Vec3> for Vec3 {
-    type Output = Vec3;
-
-    fn sub(self, _rhs: &Vec3) -> Self::Output {
         Vec3 {
             x: self.x - _rhs.x,
             y: self.y - _rhs.y,
