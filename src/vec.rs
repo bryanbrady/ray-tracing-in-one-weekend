@@ -47,6 +47,19 @@ impl ops::Add<f64> for Vec3 {
 
 }
 
+impl ops::Add<Vec3> for f64 {
+    type Output = Vec3;
+
+    fn add(self, _rhs: Vec3) -> Self::Output {
+        Vec3 {
+            x: self + _rhs.x,
+            y: self + _rhs.y,
+            z: self + _rhs.z
+        }
+    }
+
+}
+
 impl ops::Sub<Vec3> for Vec3 {
     type Output = Vec3;
 
@@ -83,6 +96,19 @@ impl ops::Mul<f64> for Vec3 {
     }
 }
 
+impl ops::Mul<Vec3> for f64 {
+    type Output = Vec3;
+
+    fn mul(self, _rhs: Vec3) -> Self::Output {
+        Vec3 {
+            x: self * _rhs.x,
+            y: self * _rhs.y,
+            z: self * _rhs.z
+        }
+    }
+
+}
+
 impl ops::Div<f64> for Vec3 {
     type Output = Vec3;
 
@@ -92,9 +118,22 @@ impl ops::Div<f64> for Vec3 {
 }
 
 impl Vec3 {
-    pub fn length(&self) -> f64 {
-        f64::sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
+    pub fn new(x: f64, y: f64, z: f64) -> Vec3 {
+        Vec3 {
+            x: x,
+            y: y,
+            z: z
+        }
     }
+
+    pub fn length_squared(&self) -> f64 {
+        self.x * self.x + self.y * self.y + self.z * self.z
+    }
+
+    pub fn length(&self) -> f64 {
+        f64::sqrt(self.length_squared())
+    }
+
     #[allow(dead_code)]
     pub fn dot(self, _rhs: Vec3) -> f64 {
         self.x * _rhs.x + self.y * _rhs.y + self.z * _rhs.z

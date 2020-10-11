@@ -3,6 +3,7 @@ use std::io::{self};
 
 mod color;
 use color::Color;
+use color::color;
 use color::write_color;
 
 mod ray;
@@ -13,24 +14,32 @@ use vec::Vec3;
 
 
 #[allow(dead_code)]
-fn hit_sphere(center: Vec3, radius: f64, r : Ray) -> bool {
+fn hit_sphere(center: Vec3, radius: f64, r : Ray) -> f64{
     let oc = r.origin - center;
     let a = r.direction.dot(r.direction);
     let b = 2.0 * oc.dot(r.direction);
     let c = oc.dot(oc) - radius*radius;
     let discriminant = b*b - 4.0*a*c;
-    return discriminant > 0.0
+    if discriminant < 0.0 {
+        return -1.0
+    } else {
+        return (-b - f64::sqrt(discriminant)) / (2.0*a)
+    }
 }
 
 #[allow(dead_code)]
 fn ray_color(_ray : Ray) -> Color {
-    if hit_sphere(Vec3{x: 0.0, y: 0.0, z: -1.0}, 0.5, _ray) {
-        return Color{ r: 1.0, g: 0.0, b: 0.0 }
+    let t_hit = hit_sphere(Vec3{x: 0.0, y: 0.0, z: -1.0}, 0.5, _ray);
+    if t_hit > 0.0 {
+        let v = _ray.at(t_hit) - Vec3::new(0.0, 0.0, -1.0);
+        let n = 0.5 * (v.unit_vector() + 1.0);
+        let c = color(n.x, n.y, n.z);
+        return c
     }
     let unit = _ray.direction.unit_vector();
     let t = 0.5 * (unit.y + 1.0);
-    let c = Vec3{x: 1.0, y: 1.0, z: 1.0} * (1.0-t) + Vec3{x: 0.5, y: 0.7, z: 1.0} * t;
-    Color{ r: c.x, g: c.y, b: c.z }
+    let c = (1.0 - t) * Vec3::new(1.0, 1.0, 1.0)  + t * Vec3::new(0.5, 0.7, 1.0);
+    color(c.x, c.y, c.z)
 }
 
 
