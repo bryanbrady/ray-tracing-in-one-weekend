@@ -117,6 +117,18 @@ impl ops::Div<f64> for Vec3 {
     }
 }
 
+impl ops::Neg for Vec3 {
+    type Output = Vec3;
+
+    fn neg(self) -> Self::Output {
+        Vec3 {
+            x: -self.x,
+            y: -self.y,
+            z: -self.z
+        }
+    }
+}
+
 impl Vec3 {
     pub fn new(x: f64, y: f64, z: f64) -> Vec3 {
         Vec3 {
