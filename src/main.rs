@@ -1,15 +1,18 @@
+mod color;
+mod hittable;
+mod ray;
+mod sphere;
+mod vec;
 
 use std::io::{self};
 
-mod color;
 use color::Color;
 use color::color;
 use color::write_color;
 
-mod ray;
+use hittable::Hittable;
 use ray::Ray;
-
-mod vec;
+use sphere::Sphere;
 use vec::Vec3;
 
 
@@ -29,19 +32,22 @@ fn hit_sphere(center: Vec3, radius: f64, r : Ray) -> f64{
 
 #[allow(dead_code)]
 fn ray_color(_ray : Ray) -> Color {
-    let t_hit = hit_sphere(Vec3{x: 0.0, y: 0.0, z: -1.0}, 0.5, _ray);
-    if t_hit > 0.0 {
-        let v = _ray.at(t_hit) - Vec3::new(0.0, 0.0, -1.0);
-        let n = 0.5 * (v.unit_vector() + 1.0);
-        let c = color(n.x, n.y, n.z);
-        return c
-    }
-    let unit = _ray.direction.unit_vector();
-    let t = 0.5 * (unit.y + 1.0);
-    let c = (1.0 - t) * Vec3::new(1.0, 1.0, 1.0)  + t * Vec3::new(0.5, 0.7, 1.0);
-    color(c.x, c.y, c.z)
-}
+    let sphere = Sphere::new(Vec3{x: 0.0, y: 0.0, z: -1.0}, 0.5);
+    match sphere.hit(&_ray, 0.0, 2.0) {
+        Some(hit) => {
+            let n = 0.5 * (hit.normal.unit_vector() + 1.0);
+            let c = color(n.x, n.y, n.z);
+            return c
+        }
+        None => {
+            let unit = _ray.direction.unit_vector();
+            let t = 0.5 * (unit.y + 1.0);
+            let c = (1.0 - t) * Vec3::new(1.0, 1.0, 1.0)  + t * Vec3::new(0.5, 0.7, 1.0);
+            color(c.x, c.y, c.z)
+        }
 
+    }
+}
 
 fn main() -> io::Result<()> {
 
