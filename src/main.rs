@@ -1,3 +1,4 @@
+mod camera;
 mod color;
 mod hittable;
 mod ray;
@@ -7,10 +8,10 @@ mod vec;
 
 use std::io::{self};
 
+use camera::Camera;
 use color::Color;
 use color::color;
 use color::write_color;
-
 use hittable::{Hittable,HittableList};
 use ray::Ray;
 use shape::Shape;
@@ -69,13 +70,7 @@ fn main() -> io::Result<()> {
     const VIEWPORT_HEIGHT: f64 = 2.0;
     const VIEWPORT_WIDTH: f64 = ASPECT_RATIO * VIEWPORT_HEIGHT;
     const FOCAL_LENGTH: f64 = 1.0;
-
-    const ORIG: Vec3 = Vec3{x: 0.0, y: 0.0, z: 0.0};
-    const HORIZONTAL: Vec3  = Vec3{x: VIEWPORT_WIDTH, y: 0.0, z: 0.0};
-    const VERTICAL: Vec3  = Vec3{x: 0.0, y: VIEWPORT_HEIGHT, z: 0.0};
-    let lower_left = ORIG - HORIZONTAL/2.0
-                   - VERTICAL/2.0
-                   - Vec3{x: 0.0, y: 0.0, z: FOCAL_LENGTH};
+    let camera = Camera::new(ASPECT_RATIO, VIEWPORT_HEIGHT, VIEWPORT_WIDTH, FOCAL_LENGTH);
 
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
     for h in  (0..IMAGE_HEIGHT).rev() {
@@ -83,10 +78,7 @@ fn main() -> io::Result<()> {
         for w in 0..IMAGE_WIDTH {
             let u = (w as f64) / ((IMAGE_WIDTH-1) as f64);
             let v = (h as f64) / ((IMAGE_HEIGHT-1) as f64);
-            let r = Ray{
-                origin: ORIG,
-                direction: &lower_left + HORIZONTAL*u + VERTICAL*v - ORIG
-            };
+            let r = camera.get_ray(u, v);
             write_color(&mut io::stdout(), ray_color(r, &world))?;
         }
     }
