@@ -1,6 +1,7 @@
 mod color;
 mod hittable;
 mod ray;
+mod shape;
 mod sphere;
 mod vec;
 
@@ -10,8 +11,9 @@ use color::Color;
 use color::color;
 use color::write_color;
 
-use hittable::Hittable;
+use hittable::{Hittable,HittableList};
 use ray::Ray;
+use shape::Shape;
 use sphere::Sphere;
 use vec::Vec3;
 
@@ -31,16 +33,15 @@ fn hit_sphere(center: Vec3, radius: f64, r : Ray) -> f64{
 }
 
 #[allow(dead_code)]
-fn ray_color(_ray : Ray) -> Color {
-    let sphere = Sphere::new(Vec3{x: 0.0, y: 0.0, z: -1.0}, 0.5);
-    match sphere.hit(&_ray, 0.0, 2.0) {
+fn ray_color(ray : Ray, world: &HittableList) -> Color {
+    match world.hit(&ray, 0.0, std::f64::INFINITY) {
         Some(hit) => {
             let n = 0.5 * (hit.normal.unit_vector() + 1.0);
             let c = color(n.x, n.y, n.z);
             return c
         }
         None => {
-            let unit = _ray.direction.unit_vector();
+            let unit = ray.direction.unit_vector();
             let t = 0.5 * (unit.y + 1.0);
             let c = (1.0 - t) * Vec3::new(1.0, 1.0, 1.0)  + t * Vec3::new(0.5, 0.7, 1.0);
             color(c.x, c.y, c.z)
@@ -55,6 +56,14 @@ fn main() -> io::Result<()> {
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
     const IMAGE_WIDTH: u64 = 400;
     const IMAGE_HEIGHT: u64 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u64;
+
+
+    // World
+    let sphere1 = Sphere { center: Vec3{x: 0.0,  y: 0.0, z: -1.0}, radius: 0.5 };
+    let sphere2 = Sphere { center: Vec3{x: 0.0,  y: -100.5, z: -1.0}, radius: 100.0 };
+    let mut world = HittableList::new();
+    world.add(Shape::Sphere(sphere1));
+    world.add(Shape::Sphere(sphere2));
 
     // Camera
     const VIEWPORT_HEIGHT: f64 = 2.0;
@@ -78,7 +87,7 @@ fn main() -> io::Result<()> {
                 origin: ORIG,
                 direction: &lower_left + HORIZONTAL*u + VERTICAL*v - ORIG
             };
-            write_color(&mut io::stdout(), ray_color(r))?;
+            write_color(&mut io::stdout(), ray_color(r, &world))?;
         }
     }
     eprintln!("Done!\n");

@@ -9,6 +9,7 @@ pub struct Sphere {
 }
 
 impl Sphere {
+    #[allow(dead_code)]
     pub fn new(center: Vec3, radius: f64) -> Sphere {
         Sphere{
             center: center,
@@ -18,6 +19,7 @@ impl Sphere {
 }
 
 impl Hittable for Sphere {
+
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = ray.origin - self.center;
         let a = ray.direction.length_squared();
