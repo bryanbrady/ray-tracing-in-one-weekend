@@ -1,4 +1,6 @@
 use std::ops;
+use rand::prelude::*;
+
 
 #[derive(Debug,Clone,Copy)]
 pub struct Vec3 {
@@ -164,6 +166,41 @@ impl Vec3 {
     pub fn unit_vector(self) -> Vec3 {
         let len = self.length();
         self / len
+    }
+
+    pub fn random(min: f64, max: f64) -> Vec3 {
+        Vec3{
+            x: rand::thread_rng().gen_range(min,max),
+            y: rand::thread_rng().gen_range(min,max),
+            z: rand::thread_rng().gen_range(min,max)
+        }
+    }
+
+    pub fn random_in_unit_sphere() -> Vec3 {
+        loop {
+            let u = Vec3::random(-1.0, 1.0);
+            if u.length_squared() < 1.0 {
+                return u;
+            }
+
+        }
+    }
+
+    // Lambertian distribution
+    pub fn random_unit_vector() -> Vec3 {
+        let a = rand::thread_rng().gen_range(0.0, 2.0*std::f64::consts::PI);
+        let z = rand::thread_rng().gen_range(-1.0, 1.0);
+        let r = f64::sqrt(1.0 - z*z);
+        return Vec3::new(r*f64::cos(a), r*f64::sin(a), z);
+    }
+
+    pub fn random_in_hemisphere(normal: &Vec3) -> Vec3 {
+        let r = Vec3::random_in_unit_sphere();
+        if r.dot(*normal) > 0.0 {
+            return r;
+        } else {
+            return -r;
+        }
     }
 
 }

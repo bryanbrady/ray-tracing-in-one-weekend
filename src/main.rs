@@ -22,12 +22,16 @@ use vec::Vec3;
 
 
 #[allow(dead_code)]
-fn ray_color(ray : Ray, world: &HittableList) -> Color {
-    match world.hit(&ray, 0.0, std::f64::INFINITY) {
+fn ray_color(ray : Ray, world: &HittableList, depth: u32) -> Color {
+    if depth <= 0 {
+        return color(0.0, 0.0, 0.0)
+    }
+    match world.hit(&ray, 0.0001, std::f64::INFINITY) {
         Some(hit) => {
-            let n = 0.5 * (hit.normal.unit_vector() + 1.0);
-            let c = color(n.x, n.y, n.z);
-            return c
+            // TODO make diffuse method configurable via CLI
+            let target = hit.point + hit.normal + Vec3::random_unit_vector();
+            let r = Ray { origin: hit.point, direction: target - hit.point };
+            return 0.5 * ray_color(r, world, depth-1);
         }
         None => {
             let unit = ray.direction.unit_vector();
@@ -46,6 +50,7 @@ fn main() -> io::Result<()> {
     const IMAGE_WIDTH: u64 = 400;
     const IMAGE_HEIGHT: u64 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u64;
     const SAMPLES_PER_PIXEL: u64 = 100;
+    const MAX_DEPTH: u32 = 50;
 
 
     // World
@@ -73,7 +78,7 @@ fn main() -> io::Result<()> {
                 let u: f64 = ((w as f64) + ur) / ((IMAGE_WIDTH-1) as f64);
                 let v: f64 = ((h as f64) + vr) / ((IMAGE_HEIGHT-1) as f64);
                 let r = camera.get_ray(u, v);
-                pixel_color += ray_color(r, &world);
+                pixel_color += ray_color(r, &world, MAX_DEPTH);
             }
 
             write_color(&mut io::stdout(), pixel_color, SAMPLES_PER_PIXEL)?;
