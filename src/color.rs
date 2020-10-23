@@ -40,6 +40,18 @@ impl ops::Mul<f64> for Color {
     }
 }
 
+impl ops::Mul<Color> for f64{
+    type Output = Color;
+
+    fn mul(self, _rhs: Color) -> Self::Output {
+        Color {
+            r: self * _rhs.r,
+            g: self * _rhs.g,
+            b: self * _rhs.b
+        }
+    }
+}
+
 pub fn write_color(_out: &mut impl Write, color: Color, samples_per_pixel: u64) -> io::Result<()> {
     let scale = 1.0 / (samples_per_pixel as f64);
     let c = color * scale;
