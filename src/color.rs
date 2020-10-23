@@ -55,9 +55,9 @@ impl ops::Mul<Color> for f64{
 pub fn write_color(_out: &mut impl Write, color: Color, samples_per_pixel: u64) -> io::Result<()> {
     let scale = 1.0 / (samples_per_pixel as f64);
     let c = color * scale;
-    let ir = (255.999 * clamp(c.r, 0.0, 0.999)) as u64;
-    let ig = (255.999 * clamp(c.g, 0.0, 0.999)) as u64;
-    let ib = (255.999 * clamp(c.b, 0.0, 0.999)) as u64;
+    let ir = (255.999 * clamp(f64::sqrt(c.r), 0.0, 0.999)) as u64;
+    let ig = (255.999 * clamp(f64::sqrt(c.g), 0.0, 0.999)) as u64;
+    let ib = (255.999 * clamp(f64::sqrt(c.b), 0.0, 0.999)) as u64;
     let out = format!("{} {} {}\n", ir, ig, ib);
     _out.write_all(out.as_bytes())?;
     Ok(())
