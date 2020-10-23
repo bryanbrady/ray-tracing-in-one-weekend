@@ -18,7 +18,7 @@ pub fn color(x: f64, y: f64, z: f64) -> Color {
     }
 }
 
-impl ops::AddAssign<Color> for Color{
+impl ops::AddAssign<Color> for Color {
     fn add_assign(&mut self, _rhs: Self) {
         *self = Self {
             r: self.r + _rhs.r,
@@ -28,7 +28,7 @@ impl ops::AddAssign<Color> for Color{
     }
 }
 
-impl ops::Mul<f64> for Color{
+impl ops::Mul<f64> for Color {
     type Output = Color;
 
     fn mul(self, _rhs: f64) -> Self::Output {
