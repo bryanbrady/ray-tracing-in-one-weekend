@@ -51,6 +51,41 @@ fn ray_color(ray : Ray, world: &HittableList, depth: u32) -> Color {
     }
 }
 
+#[allow(dead_code)]
+fn world1() -> HittableList {
+    // World 1
+    let material_ground = Rc::new(Lambertian { albedo: color(0.8, 0.8, 0.0) });
+    let material_center = Rc::new(Lambertian { albedo: color(0.1, 0.2, 0.5) });
+    let material_left   = Rc::new(Dielectric { ir: 1.5 });
+    let material_right  = Rc::new(Metal::new(color(0.8, 0.6, 0.2), 0.0));
+    let sphere1 = Sphere { center: Vec3{x:  0.0,  y: -100.5, z: -1.0}, radius: 100.0, mat: material_ground.clone()};
+    let sphere2 = Sphere { center: Vec3{x:  0.0,  y:    0.0, z: -1.0}, radius:   0.5, mat: material_center.clone()};
+    let sphere3 = Sphere { center: Vec3{x: -1.0,  y:    0.0, z: -1.0}, radius:   0.5, mat: material_left.clone()};
+    let sphere4 = Sphere { center: Vec3{x: -1.0,  y:    0.0, z: -1.0}, radius: -0.45, mat: material_left.clone()};
+    let sphere5 = Sphere { center: Vec3{x:  1.0,  y:    0.0, z: -1.0}, radius:   0.5, mat: material_right.clone()};
+    let mut world = HittableList::new();
+    world.add(Shape::Sphere(sphere1));
+    world.add(Shape::Sphere(sphere2));
+    world.add(Shape::Sphere(sphere3));
+    world.add(Shape::Sphere(sphere4));
+    world.add(Shape::Sphere(sphere5));
+    return world;
+}
+
+#[allow(dead_code)]
+fn world2() -> HittableList {
+    // World 2
+    let r = f64::cos(std::f64::consts::PI / 4.0);
+    let material_left   = Rc::new(Lambertian {albedo: color(0.0, 0.0, 1.0)});
+    let material_right  = Rc::new(Lambertian {albedo: color(1.0, 0.0, 0.0)});
+    let sphere1 = Sphere { center: Vec3{x: -r, y: 0.0, z: -1.0},  radius: r, mat: material_left.clone()};
+    let sphere2 = Sphere { center: Vec3{x:  r, y: 0.0, z: -1.0},  radius: r, mat: material_right.clone()};
+    let mut world = HittableList::new();
+    world.add(Shape::Sphere(sphere1));
+    world.add(Shape::Sphere(sphere2));
+    return world;
+}
+
 fn main() -> io::Result<()> {
 
     // Image
@@ -60,29 +95,19 @@ fn main() -> io::Result<()> {
     const SAMPLES_PER_PIXEL: u64 = 100;
     const MAX_DEPTH: u32 = 50;
 
-
     // World
-    let material_ground = Rc::new(Lambertian { albedo: color(0.8, 0.8, 0.0) });
-    let material_center = Rc::new(Lambertian { albedo: color(0.1, 0.2, 0.5) });
-    let material_left   = Rc::new(Dielectric { ir: 1.5 });
-    let material_right  = Rc::new(Metal::new(color(0.8, 0.6, 0.2), 1.0));
-    let sphere1 = Sphere { center: Vec3{x: 0.0,   y: -100.5, z: -1.0},    radius: 100.0, mat: material_ground.clone()};
-    let sphere2 = Sphere { center: Vec3{x: 0.0,   y: 0.0,    z: -1.0},    radius: 0.5,   mat: material_center.clone()};
-    let sphere3 = Sphere { center: Vec3{x: -1.0,  y: 0.0,    z: -1.0},    radius: 0.5,   mat: material_left.clone()};
-    let sphere4 = Sphere { center: Vec3{x: -1.0,  y: 0.0,    z: -1.0},    radius: -0.4,  mat: material_left.clone()};
-    let sphere5 = Sphere { center: Vec3{x: 1.0,   y: 0.0,    z: -1.0},    radius: 0.5,   mat: material_right.clone()};
-    let mut world = HittableList::new();
-    world.add(Shape::Sphere(sphere1));
-    world.add(Shape::Sphere(sphere2));
-    world.add(Shape::Sphere(sphere3));
-    world.add(Shape::Sphere(sphere4));
-    world.add(Shape::Sphere(sphere5));
+    let world = world1();
 
     // Camera
-    const VIEWPORT_HEIGHT: f64 = 2.0;
-    const VIEWPORT_WIDTH: f64 = ASPECT_RATIO * VIEWPORT_HEIGHT;
-    const FOCAL_LENGTH: f64 = 1.0;
-    let camera = Camera::new(ASPECT_RATIO, VIEWPORT_HEIGHT, VIEWPORT_WIDTH, FOCAL_LENGTH);
+    // const VFOV: f64 = 90.0;
+    // let lookfrom = Vec3::new(-2.0, 2.0, 1.0);
+    // let lookat= Vec3::new(0.0, 0.0, -1.0);
+    // let vup = Vec3::new(0.0, 1.0, 0.0);
+    const VFOV: f64 = 20.0;
+    let lookfrom = Vec3::new(-2.0, 2.0, 1.0);
+    let lookat= Vec3::new(0.0, 0.0, -1.0);
+    let vup = Vec3::new(0.0, 1.0, 0.0);
+    let camera = Camera::new(lookfrom, lookat, vup, VFOV, ASPECT_RATIO);
 
     let mut rng = rand::thread_rng();
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);

@@ -35,6 +35,7 @@ pub struct Metal {
 }
 
 impl Metal {
+    #[allow(dead_code)]
     pub fn new(albedo: Color, fuzz: f64) -> Metal {
         Metal {
             albedo: albedo,
