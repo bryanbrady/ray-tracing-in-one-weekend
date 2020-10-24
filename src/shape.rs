@@ -2,7 +2,6 @@ use crate::hittable::{HitRecord, Hittable};
 use crate::ray::Ray;
 use crate::sphere::Sphere;
 
-#[derive(Debug,Clone,Copy)]
 pub enum Shape {
     Sphere(Sphere)
 }
