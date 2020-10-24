@@ -1,6 +1,7 @@
 mod camera;
 mod color;
 mod hittable;
+mod material;
 mod ray;
 mod shape;
 mod sphere;
@@ -15,11 +16,13 @@ use color::Color;
 use color::color;
 use color::write_color;
 use hittable::{Hittable,HittableList};
+use material::{Lambertian,Metal};
 use ray::Ray;
 use shape::Shape;
 use sphere::Sphere;
 use vec::Vec3;
 
+use std::rc::Rc;
 
 #[allow(dead_code)]
 fn ray_color(ray : Ray, world: &HittableList, depth: u32) -> Color {
@@ -28,16 +31,21 @@ fn ray_color(ray : Ray, world: &HittableList, depth: u32) -> Color {
     }
     match world.hit(&ray, 0.0001, std::f64::INFINITY) {
         Some(hit) => {
-            // TODO make diffuse method configurable via CLI
-            let target = hit.point + hit.normal + Vec3::random_unit_vector();
-            let r = Ray { origin: hit.point, direction: target - hit.point };
-            return 0.5 * ray_color(r, world, depth-1);
+            match hit.mat.scatter(&ray, &hit) {
+                Some(scatter) => {
+                    return scatter.attenuation * ray_color(scatter.scattered, world, depth-1);
+                }
+                None => {
+                    return color(0.0, 0.0, 0.0);
+                }
+
+            }
         }
         None => {
             let unit = ray.direction.unit_vector();
             let t = 0.5 * (unit.y + 1.0);
             let c = (1.0 - t) * Vec3::new(1.0, 1.0, 1.0)  + t * Vec3::new(0.5, 0.7, 1.0);
-            color(c.x, c.y, c.z)
+            return color(c.x, c.y, c.z);
         }
 
     }
@@ -54,11 +62,19 @@ fn main() -> io::Result<()> {
 
 
     // World
-    let sphere1 = Sphere { center: Vec3{x: 0.0,  y: 0.0, z: -1.0}, radius: 0.5 };
-    let sphere2 = Sphere { center: Vec3{x: 0.0,  y: -100.5, z: -1.0}, radius: 100.0 };
+    let material_ground = Rc::new(Lambertian { albedo: color(0.8, 0.8, 0.0) });
+    let material_center = Rc::new(Lambertian { albedo: color(0.7, 0.3, 0.3) });
+    let material_left   = Rc::new(Metal::new(color(0.8, 0.8, 0.8), 0.3));
+    let material_right  = Rc::new(Metal::new(color(0.8, 0.6, 0.2), 1.0));
+    let sphere1 = Sphere { center: Vec3{x: 0.0,   y: -100.5, z: -1.0},    radius: 100.0, mat: material_ground.clone()};
+    let sphere2 = Sphere { center: Vec3{x: 0.0,   y: 0.0,    z: -1.0},    radius: 0.5,   mat: material_center.clone()};
+    let sphere3 = Sphere { center: Vec3{x: -1.0,  y: 0.0,    z: -1.0},    radius: 0.5,   mat: material_left.clone()};
+    let sphere4 = Sphere { center: Vec3{x: 1.0,   y: 0.0,    z: -1.0},    radius: 0.5,   mat: material_right.clone()};
     let mut world = HittableList::new();
     world.add(Shape::Sphere(sphere1));
     world.add(Shape::Sphere(sphere2));
+    world.add(Shape::Sphere(sphere3));
+    world.add(Shape::Sphere(sphere4));
 
     // Camera
     const VIEWPORT_HEIGHT: f64 = 2.0;
