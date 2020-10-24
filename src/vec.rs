@@ -148,12 +148,10 @@ impl Vec3 {
         f64::sqrt(self.length_squared())
     }
 
-    #[allow(dead_code)]
     pub fn dot(self, _rhs: Vec3) -> f64 {
         self.x * _rhs.x + self.y * _rhs.y + self.z * _rhs.z
     }
 
-    #[allow(dead_code)]
     pub fn cross(self, _rhs: Vec3) -> Vec3 {
         Vec3 {
             x: self.y * _rhs.z - self.z * _rhs.y,
@@ -162,7 +160,6 @@ impl Vec3 {
         }
     }
 
-    #[allow(dead_code)]
     pub fn unit_vector(self) -> Vec3 {
         let len = self.length();
         self / len
@@ -170,6 +167,13 @@ impl Vec3 {
 
     pub fn reflect(v: Vec3, n: Vec3) -> Vec3 {
         return v - 2.0*v.dot(n)*n;
+    }
+
+    pub fn refract(uv: Vec3, n: Vec3, etai_over_etat: f64) -> Vec3 {
+        let cos_theta = -uv.dot(n);
+        let r_out_perp = etai_over_etat * (uv + cos_theta*n);
+        let r_out_parallel = -f64::sqrt(f64::abs(1.0 - r_out_perp.length_squared())) * n;
+        return r_out_perp + r_out_parallel;
     }
 
     pub fn random(min: f64, max: f64) -> Vec3 {

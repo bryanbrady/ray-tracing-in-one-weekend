@@ -16,7 +16,7 @@ use color::Color;
 use color::color;
 use color::write_color;
 use hittable::{Hittable,HittableList};
-use material::{Lambertian,Metal};
+use material::{Dielectric,Lambertian,Metal};
 use ray::Ray;
 use shape::Shape;
 use sphere::Sphere;
@@ -63,18 +63,20 @@ fn main() -> io::Result<()> {
 
     // World
     let material_ground = Rc::new(Lambertian { albedo: color(0.8, 0.8, 0.0) });
-    let material_center = Rc::new(Lambertian { albedo: color(0.7, 0.3, 0.3) });
-    let material_left   = Rc::new(Metal::new(color(0.8, 0.8, 0.8), 0.3));
+    let material_center = Rc::new(Lambertian { albedo: color(0.1, 0.2, 0.5) });
+    let material_left   = Rc::new(Dielectric { ir: 1.5 });
     let material_right  = Rc::new(Metal::new(color(0.8, 0.6, 0.2), 1.0));
     let sphere1 = Sphere { center: Vec3{x: 0.0,   y: -100.5, z: -1.0},    radius: 100.0, mat: material_ground.clone()};
     let sphere2 = Sphere { center: Vec3{x: 0.0,   y: 0.0,    z: -1.0},    radius: 0.5,   mat: material_center.clone()};
     let sphere3 = Sphere { center: Vec3{x: -1.0,  y: 0.0,    z: -1.0},    radius: 0.5,   mat: material_left.clone()};
-    let sphere4 = Sphere { center: Vec3{x: 1.0,   y: 0.0,    z: -1.0},    radius: 0.5,   mat: material_right.clone()};
+    let sphere4 = Sphere { center: Vec3{x: -1.0,  y: 0.0,    z: -1.0},    radius: -0.4,  mat: material_left.clone()};
+    let sphere5 = Sphere { center: Vec3{x: 1.0,   y: 0.0,    z: -1.0},    radius: 0.5,   mat: material_right.clone()};
     let mut world = HittableList::new();
     world.add(Shape::Sphere(sphere1));
     world.add(Shape::Sphere(sphere2));
     world.add(Shape::Sphere(sphere3));
     world.add(Shape::Sphere(sphere4));
+    world.add(Shape::Sphere(sphere5));
 
     // Camera
     const VIEWPORT_HEIGHT: f64 = 2.0;
