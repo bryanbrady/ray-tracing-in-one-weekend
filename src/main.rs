@@ -24,6 +24,8 @@ use vec::Vec3;
 
 use std::rc::Rc;
 
+const ASPECT_RATIO: f64 = 16.0 / 9.0;
+
 #[allow(dead_code)]
 fn ray_color(ray : Ray, world: &HittableList, depth: u32) -> Color {
     if depth <= 0 {
@@ -86,10 +88,19 @@ fn world2() -> HittableList {
     return world;
 }
 
+fn camera2() -> Camera {
+    let vfov: f64 = 20.0;
+    let lookfrom = Vec3::new(3.0, 3.0, 2.0);
+    let lookat= Vec3::new(0.0, 0.0, -1.0);
+    let vup = Vec3::new(0.0, 1.0, 0.0);
+    let aperture = 2.0;
+    let dist_to_focus = (lookfrom-lookat).length();
+    return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus);
+}
+
 fn main() -> io::Result<()> {
 
     // Image
-    const ASPECT_RATIO: f64 = 16.0 / 9.0;
     const IMAGE_WIDTH: u64 = 400;
     const IMAGE_HEIGHT: u64 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u64;
     const SAMPLES_PER_PIXEL: u64 = 100;
@@ -99,15 +110,7 @@ fn main() -> io::Result<()> {
     let world = world1();
 
     // Camera
-    // const VFOV: f64 = 90.0;
-    // let lookfrom = Vec3::new(-2.0, 2.0, 1.0);
-    // let lookat= Vec3::new(0.0, 0.0, -1.0);
-    // let vup = Vec3::new(0.0, 1.0, 0.0);
-    const VFOV: f64 = 20.0;
-    let lookfrom = Vec3::new(-2.0, 2.0, 1.0);
-    let lookat= Vec3::new(0.0, 0.0, -1.0);
-    let vup = Vec3::new(0.0, 1.0, 0.0);
-    let camera = Camera::new(lookfrom, lookat, vup, VFOV, ASPECT_RATIO);
+    let camera = camera2();
 
     let mut rng = rand::thread_rng();
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
