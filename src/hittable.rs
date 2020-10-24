@@ -1,20 +1,22 @@
+use crate::material::Material;
 use crate::ray::Ray;
 use crate::shape::Shape;
 use crate::vec::{Vec3};
 
-#[derive(Debug,Clone,Copy)]
+use std::rc::Rc;
+
 pub struct HitRecord {
     pub point: Vec3,
     pub normal: Vec3,
     pub t: f64,
-    pub front_face: bool
+    pub front_face: bool,
+    pub mat: Rc<dyn Material>
 }
 
 pub trait Hittable {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
 
-#[derive(Debug)]
 pub struct HittableList {
     pub hittables : Vec<Shape>
 }
