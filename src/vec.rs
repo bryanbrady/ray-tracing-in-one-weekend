@@ -168,6 +168,10 @@ impl Vec3 {
         self / len
     }
 
+    pub fn reflect(v: Vec3, n: Vec3) -> Vec3 {
+        return v - 2.0*v.dot(n)*n;
+    }
+
     pub fn random(min: f64, max: f64) -> Vec3 {
         Vec3{
             x: rand::thread_rng().gen_range(min,max),
