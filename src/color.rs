@@ -3,7 +3,7 @@ use std::ops;
 
 use crate::util::clamp;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Color {
     pub r: f64,
     pub g: f64,
@@ -40,7 +40,7 @@ impl ops::Mul<f64> for Color {
     }
 }
 
-impl ops::Mul<Color> for f64{
+impl ops::Mul<Color> for f64 {
     type Output = Color;
 
     fn mul(self, _rhs: Color) -> Self::Output {
@@ -48,6 +48,18 @@ impl ops::Mul<Color> for f64{
             r: self * _rhs.r,
             g: self * _rhs.g,
             b: self * _rhs.b
+        }
+    }
+}
+
+impl ops::Mul<Color> for Color {
+    type Output = Color;
+
+    fn mul(self, _rhs: Color) -> Self::Output {
+        Color {
+            r: self.r * _rhs.r,
+            g: self.g * _rhs.g,
+            b: self.b * _rhs.b
         }
     }
 }
