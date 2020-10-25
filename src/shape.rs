@@ -20,7 +20,7 @@ impl Hittable for Shape {
 
 }
 
-
+#[allow(dead_code)]
 pub fn sphere(center: Vec3, radius: f64, mat: Rc<dyn Material>) -> Shape {
     Shape::Sphere(Sphere{
         center: center,
