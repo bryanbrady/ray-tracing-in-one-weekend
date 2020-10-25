@@ -1,3 +1,4 @@
 /target
 *.ppm
+!/images/*.ppm
 Cargo.lock
