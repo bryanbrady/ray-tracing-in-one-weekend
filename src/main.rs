@@ -29,8 +29,9 @@ use vec::Vec3;
 const ASPECT_RATIO: f64 = 3.0 / 2.0;
 const IMAGE_WIDTH: u64 = 300;
 const IMAGE_HEIGHT: u64 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u64;
-const SAMPLES_PER_PIXEL: u64 = 50;
+const SAMPLES_PER_PIXEL: u64 = 100;
 const MAX_DEPTH: u32 = 50;
+const GRID_SIZE: i32 = 3;
 
 #[allow(dead_code)]
 fn ray_color(ray : Ray, world: &HittableList, depth: u32) -> Color {
@@ -101,8 +102,8 @@ fn random_world() -> HittableList {
     let material_ground = Rc::new(Lambertian{albedo: color(0.5, 0.5, 0.5)});
     world.add(sphere(Vec3::new(0.0, -1000.0, 0.0), 1000.0, material_ground));
 
-    for a in -11..11 {
-        for b in -11..11 {
+    for a in -GRID_SIZE..GRID_SIZE {
+        for b in -GRID_SIZE..GRID_SIZE {
             let choose_mat: f64 = rng.gen::<f64>();
             let center = Vec3 {
                 x: (a as f64) + 0.9 * rng.gen::<f64>(),
@@ -177,7 +178,7 @@ fn camera_final() -> Camera {
 fn main() -> io::Result<()> {
 
     // World
-    let world = world1();
+    let world = random_world();
 
     // Camera
     let camera = camera_final();
