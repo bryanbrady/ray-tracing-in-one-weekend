@@ -1,6 +1,10 @@
 use crate::hittable::{HitRecord, Hittable};
+use crate::material::Material;
 use crate::ray::Ray;
 use crate::sphere::Sphere;
+use crate::vec::Vec3;
+
+use std::rc::Rc;
 
 pub enum Shape {
     Sphere(Sphere)
@@ -16,3 +20,11 @@ impl Hittable for Shape {
 
 }
 
+
+pub fn sphere(center: Vec3, radius: f64, mat: Rc<dyn Material>) -> Shape {
+    Shape::Sphere(Sphere{
+        center: center,
+        radius: radius,
+        mat: mat
+    })
+}

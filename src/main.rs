@@ -19,12 +19,14 @@ use hittable::{Hittable,HittableList};
 use material::{Dielectric,Lambertian,Metal};
 use ray::Ray;
 use shape::Shape;
+use shape::sphere;
 use sphere::Sphere;
 use vec::Vec3;
 
 use std::rc::Rc;
 
-const ASPECT_RATIO: f64 = 16.0 / 9.0;
+//const ASPECT_RATIO: f64 = 16.0 / 9.0;
+const ASPECT_RATIO: f64 = 3.0 / 2.0;
 
 #[allow(dead_code)]
 fn ray_color(ray : Ray, world: &HittableList, depth: u32) -> Color {
@@ -88,6 +90,53 @@ fn world2() -> HittableList {
     return world;
 }
 
+fn random_world() -> HittableList {
+    let mut rng = rand::thread_rng();
+    let mut world = HittableList::new();
+    let material_ground = Rc::new(Lambertian{albedo: color(0.5, 0.5, 0.5)});
+    world.add(sphere(Vec3::new(0.0, -1000.0, 0.0), 1000.0, material_ground));
+
+    for a in -11..11 {
+        for b in -11..11 {
+            let choose_mat: f64 = rng.gen::<f64>();
+            let center = Vec3 {
+                x: (a as f64) + 0.9 * rng.gen::<f64>(),
+                y: 0.2,
+                z: (b as f64) + 0.9 * rng.gen::<f64>()
+            };
+            let some_point = Vec3::new(4.0, 0.2, 0.0);
+
+            if (center - some_point).length() > 0.9 {
+                if choose_mat < 0.8 {
+                    // diffuse
+                    let albedo = Color::random(0.0, 1.0) * Color::random(0.0, 1.0);
+                    let material = Rc::new(Lambertian{albedo: albedo});
+                    world.add(sphere(center, 0.2, material));
+
+                } else if choose_mat < 0.95 {
+                    // metal
+                    let albedo = Color::random(0.5, 1.0);
+                    let fuzz = rng.gen_range(0.0, 0.5);
+                    let material = Rc::new(Metal{albedo: albedo, fuzz: fuzz});
+                    world.add(sphere(center, 0.2, material));
+
+                } else {
+                    // glass
+                    let material = Rc::new(Dielectric{ir: 1.5});
+                    world.add(sphere(center, 0.2, material));
+                }
+
+            }
+        }
+    }
+
+    world.add(sphere(Vec3::new(0.0, 1.0, 0.0),  1.0, Rc::new(Dielectric{ir: 1.5})));
+    world.add(sphere(Vec3::new(-4.0, 1.0, 0.0), 1.0, Rc::new(Lambertian{albedo: color(0.4, 0.2, 0.1)})));
+    world.add(sphere(Vec3::new(4.0, 1.0, 0.0),  1.0, Rc::new(Metal{albedo: color(0.7, 0.6, 0.5), fuzz: 0.0})));
+    return world;
+}
+
+#[allow(dead_code)]
 fn camera2() -> Camera {
     let vfov: f64 = 20.0;
     let lookfrom = Vec3::new(3.0, 3.0, 2.0);
@@ -98,19 +147,40 @@ fn camera2() -> Camera {
     return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus);
 }
 
+#[allow(dead_code)]
+fn camera3() -> Camera {
+    let vfov: f64 = 20.0;
+    let lookfrom = Vec3::new(13.0, 2.0, 3.0);
+    let lookat= Vec3::new(0.0, 0.0, 0.0);
+    let vup = Vec3::new(0.0, 1.0, 0.0);
+    let aperture = 0.1;
+    let dist_to_focus = 10.0;
+    return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus);
+}
+
+fn camera_final() -> Camera {
+    let vfov: f64 = 20.0;
+    let lookfrom = Vec3::new(13.0, 2.0, 3.0);
+    let lookat= Vec3::new(0.0, 0.0, 0.0);
+    let vup = Vec3::new(0.0, 1.0, 0.0);
+    let aperture = 0.1;
+    let dist_to_focus = 10.0;
+    return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus);
+}
+
 fn main() -> io::Result<()> {
 
     // Image
-    const IMAGE_WIDTH: u64 = 400;
+    const IMAGE_WIDTH: u64 = 1200;
     const IMAGE_HEIGHT: u64 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u64;
-    const SAMPLES_PER_PIXEL: u64 = 100;
+    const SAMPLES_PER_PIXEL: u64 = 500;
     const MAX_DEPTH: u32 = 50;
 
     // World
-    let world = world1();
+    let world = random_world();
 
     // Camera
-    let camera = camera2();
+    let camera = camera_final();
 
     let mut rng = rand::thread_rng();
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
