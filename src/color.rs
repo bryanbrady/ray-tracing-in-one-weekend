@@ -1,5 +1,6 @@
 use std::io::{self, Write};
 use std::ops;
+use rand::prelude::*;
 
 use crate::util::clamp;
 
@@ -62,6 +63,18 @@ impl ops::Mul<Color> for Color {
             b: self.b * _rhs.b
         }
     }
+}
+
+impl Color {
+    pub fn random(min: f64, max: f64) -> Color {
+        let mut rng = rand::thread_rng();
+        Color {
+            r: rng.gen(),
+            g: rng.gen(),
+            b: rng.gen()
+        }
+    }
+
 }
 
 pub fn write_color(_out: &mut impl Write, color: Color, samples_per_pixel: u64) -> io::Result<()> {
