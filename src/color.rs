@@ -1,6 +1,7 @@
 use std::io::{self, Write};
 use std::ops;
 use rand::prelude::*;
+use rand::rngs::SmallRng;
 
 use crate::util::clamp;
 
@@ -67,7 +68,7 @@ impl ops::Mul<Color> for Color {
 
 impl Color {
     pub fn random(min: f64, max: f64) -> Color {
-        let mut rng = rand::thread_rng();
+        let mut rng = SmallRng::from_entropy();
         Color {
             r: rng.gen_range(min,max),
             g: rng.gen_range(min,max),

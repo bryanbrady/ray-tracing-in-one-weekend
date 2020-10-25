@@ -3,6 +3,7 @@ use crate::hittable::HitRecord;
 use crate::ray::Ray;
 use crate::vec::Vec3;
 use rand::prelude::*;
+use rand::rngs::SmallRng;
 
 pub struct Scatter {
     pub attenuation: Color,
@@ -78,7 +79,7 @@ impl Material for Dielectric {
         let cos_theta = f64::min(-unit_direction.dot(hit.normal), 1.0);
         let sin_theta = f64::sqrt(1.0 - cos_theta * cos_theta);
         let cannot_refract = refraction_ratio * sin_theta > 1.0
-                          || Dielectric::reflectance(cos_theta, refraction_ratio) > rand::thread_rng().gen();
+                          || Dielectric::reflectance(cos_theta, refraction_ratio) > SmallRng::from_entropy().gen();
         let direction = if cannot_refract {
             Vec3::reflect(unit_direction, hit.normal)
         } else {

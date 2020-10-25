@@ -1,5 +1,6 @@
 use std::ops;
 use rand::prelude::*;
+use rand::rngs::SmallRng;
 
 
 #[derive(Debug,Clone,Copy)]
@@ -177,10 +178,11 @@ impl Vec3 {
     }
 
     pub fn random(min: f64, max: f64) -> Vec3 {
+        let mut rng = SmallRng::from_entropy();
         Vec3{
-            x: rand::thread_rng().gen_range(min,max),
-            y: rand::thread_rng().gen_range(min,max),
-            z: rand::thread_rng().gen_range(min,max)
+            x: rng.gen_range(min,max),
+            y: rng.gen_range(min,max),
+            z: rng.gen_range(min,max)
         }
     }
 
@@ -195,10 +197,11 @@ impl Vec3 {
     }
 
     pub fn random_in_unit_disk() -> Vec3 {
+        let mut rng = SmallRng::from_entropy();
         loop {
             let p = Vec3 {
-                x: rand::thread_rng().gen_range(-1.0, 1.0),
-                y: rand::thread_rng().gen_range(-1.0, 1.0),
+                x: rng.gen_range(-1.0, 1.0),
+                y: rng.gen_range(-1.0, 1.0),
                 z: 0.0
             };
             if p.length_squared() < 1.0 {
@@ -210,8 +213,9 @@ impl Vec3 {
 
     // Lambertian distribution
     pub fn random_unit_vector() -> Vec3 {
-        let a = rand::thread_rng().gen_range(0.0, 2.0*std::f64::consts::PI);
-        let z = rand::thread_rng().gen_range(-1.0, 1.0);
+        let mut rng = SmallRng::from_entropy();
+        let a = rng.gen_range(0.0, 2.0*std::f64::consts::PI);
+        let z = rng.gen_range(-1.0, 1.0);
         let r = f64::sqrt(1.0 - z*z);
         return Vec3::new(r*f64::cos(a), r*f64::sin(a), z);
     }

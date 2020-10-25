@@ -9,7 +9,9 @@ mod vec;
 mod util;
 
 use std::io::{self};
+use std::rc::Rc;
 use rand::prelude::*;
+use rand::rngs::SmallRng;
 
 use camera::Camera;
 use color::Color;
@@ -23,10 +25,12 @@ use shape::sphere;
 use sphere::Sphere;
 use vec::Vec3;
 
-use std::rc::Rc;
-
-//const ASPECT_RATIO: f64 = 16.0 / 9.0;
+// Image
 const ASPECT_RATIO: f64 = 3.0 / 2.0;
+const IMAGE_WIDTH: u64 = 300;
+const IMAGE_HEIGHT: u64 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u64;
+const SAMPLES_PER_PIXEL: u64 = 50;
+const MAX_DEPTH: u32 = 50;
 
 #[allow(dead_code)]
 fn ray_color(ray : Ray, world: &HittableList, depth: u32) -> Color {
@@ -90,8 +94,9 @@ fn world2() -> HittableList {
     return world;
 }
 
+#[allow(dead_code)]
 fn random_world() -> HittableList {
-    let mut rng = rand::thread_rng();
+    let mut rng = SmallRng::from_entropy();
     let mut world = HittableList::new();
     let material_ground = Rc::new(Lambertian{albedo: color(0.5, 0.5, 0.5)});
     world.add(sphere(Vec3::new(0.0, -1000.0, 0.0), 1000.0, material_ground));
@@ -158,6 +163,7 @@ fn camera3() -> Camera {
     return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus);
 }
 
+#[allow(dead_code)]
 fn camera_final() -> Camera {
     let vfov: f64 = 20.0;
     let lookfrom = Vec3::new(13.0, 2.0, 3.0);
@@ -170,19 +176,13 @@ fn camera_final() -> Camera {
 
 fn main() -> io::Result<()> {
 
-    // Image
-    const IMAGE_WIDTH: u64 = 1200;
-    const IMAGE_HEIGHT: u64 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u64;
-    const SAMPLES_PER_PIXEL: u64 = 500;
-    const MAX_DEPTH: u32 = 50;
-
     // World
-    let world = random_world();
+    let world = world1();
 
     // Camera
     let camera = camera_final();
 
-    let mut rng = rand::thread_rng();
+    let mut rng = SmallRng::from_entropy();
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
     for h in  (0..IMAGE_HEIGHT).rev() {
         eprintln!("Scanlines remaining: {}", h);
