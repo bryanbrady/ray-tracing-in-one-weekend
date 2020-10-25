@@ -69,9 +69,9 @@ impl Color {
     pub fn random(min: f64, max: f64) -> Color {
         let mut rng = rand::thread_rng();
         Color {
-            r: rng.gen(),
-            g: rng.gen(),
-            b: rng.gen()
+            r: rng.gen_range(min,max),
+            g: rng.gen_range(min,max),
+            b: rng.gen_range(min,max)
         }
     }
 
