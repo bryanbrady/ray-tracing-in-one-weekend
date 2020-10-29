@@ -10,15 +10,61 @@ pub struct Scatter {
     pub scattered: Ray
 }
 
-pub trait Material{
+pub trait MaterialScatter{
     fn scatter(&self, ray: &Ray, hit: &HitRecord) -> Option<Scatter>;
 }
 
+#[derive(Debug, Clone, Copy)]
 pub struct Lambertian {
     pub albedo: Color
 }
 
-impl Material for Lambertian {
+#[derive(Debug, Clone, Copy)]
+pub struct Metal {
+    pub albedo: Color,
+    pub fuzz: f64
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct Dielectric {
+    pub ir: f64
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum Material {
+    Lambertian(Lambertian),
+    Metal(Metal),
+    Dielectric(Dielectric)
+}
+
+impl Material {
+    pub fn lambertian(albedo: Color) -> Material {
+        Material::Lambertian(Lambertian { albedo: albedo })
+    }
+
+    pub fn metal(albedo: Color, fuzz: f64) -> Material {
+        Material::Metal(Metal {
+            albedo: albedo,
+            fuzz: if fuzz < 1.0 { fuzz } else { 1.0 }
+        })
+    }
+
+    pub fn dielectric(ir: f64) -> Material {
+        Material::Dielectric(Dielectric{ ir: ir })
+    }
+}
+
+impl MaterialScatter for Material {
+    fn scatter(&self, ray: &Ray, hit: &HitRecord) -> Option<Scatter> {
+        match self {
+            Material::Lambertian(m) => { m.scatter(ray, hit) },
+            Material::Metal(m)      => { m.scatter(ray, hit) },
+            Material::Dielectric(m) => { m.scatter(ray, hit) }
+        }
+    }
+}
+
+impl MaterialScatter for Lambertian {
     fn scatter(&self, _ray: &Ray, hit: &HitRecord) -> Option<Scatter> {
         let scatter_direction = hit.normal + Vec3::random_unit_vector();
         let scattered = Ray { origin: hit.point, direction: scatter_direction };
@@ -30,22 +76,7 @@ impl Material for Lambertian {
     }
 }
 
-pub struct Metal {
-    pub albedo: Color,
-    pub fuzz: f64
-}
-
-impl Metal {
-    #[allow(dead_code)]
-    pub fn new(albedo: Color, fuzz: f64) -> Metal {
-        Metal {
-            albedo: albedo,
-            fuzz: if fuzz < 1.0 { fuzz } else { 1.0 }
-        }
-    }
-}
-
-impl Material for Metal {
+impl MaterialScatter for Metal {
     fn scatter(&self, _ray: &Ray, hit: &HitRecord) -> Option<Scatter> {
         let reflected = Vec3::reflect(_ray.direction.unit_vector(), hit.normal);
         let scattered = Ray {
@@ -60,10 +91,6 @@ impl Material for Metal {
     }
 }
 
-pub struct Dielectric {
-    pub ir: f64
-}
-
 impl Dielectric {
     fn reflectance(cosine: f64, ref_idx: f64) -> f64 {
         let r0 = f64::powi((1.0 - ref_idx) / (1.0 + ref_idx), 2);
@@ -72,7 +99,7 @@ impl Dielectric {
     }
 }
 
-impl Material for Dielectric {
+impl MaterialScatter for Dielectric {
     fn scatter(&self, _ray: &Ray, hit: &HitRecord) -> Option<Scatter> {
         let refraction_ratio = if hit.front_face { 1.0 / self.ir } else { self.ir };
         let unit_direction = _ray.direction.unit_vector();

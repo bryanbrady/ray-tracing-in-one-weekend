@@ -9,7 +9,6 @@ mod vec;
 mod util;
 
 use std::io::{self};
-use std::rc::Rc;
 use rand::prelude::*;
 use rand::rngs::SmallRng;
 
@@ -18,7 +17,8 @@ use color::Color;
 use color::color;
 use color::write_color;
 use hittable::{Hittable,HittableList};
-use material::{Dielectric,Lambertian,Metal};
+use material::{MaterialScatter};
+use material::Material;
 use ray::Ray;
 use shape::Shape;
 use shape::sphere;
@@ -27,11 +27,11 @@ use vec::Vec3;
 
 // Image
 const ASPECT_RATIO: f64 = 3.0 / 2.0;
-const IMAGE_WIDTH: u64 = 300;
-const IMAGE_HEIGHT: u64 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u64;
-const SAMPLES_PER_PIXEL: u64 = 100;
+const IMAGE_WIDTH: u32 = 300;
+const IMAGE_HEIGHT: u32 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u32;
+const SAMPLES_PER_PIXEL: u64 = 500;
 const MAX_DEPTH: u32 = 50;
-const GRID_SIZE: i32 = 3;
+const GRID_SIZE: i32 = 2;
 
 #[allow(dead_code)]
 fn ray_color(ray : Ray, world: &HittableList, depth: u32) -> Color {
@@ -63,10 +63,10 @@ fn ray_color(ray : Ray, world: &HittableList, depth: u32) -> Color {
 #[allow(dead_code)]
 fn world1() -> HittableList {
     // World 1
-    let material_ground = Rc::new(Lambertian { albedo: color(0.8, 0.8, 0.0) });
-    let material_center = Rc::new(Lambertian { albedo: color(0.1, 0.2, 0.5) });
-    let material_left   = Rc::new(Dielectric { ir: 1.5 });
-    let material_right  = Rc::new(Metal::new(color(0.8, 0.6, 0.2), 0.0));
+    let material_ground = Material::lambertian(color(0.8, 0.8, 0.0));
+    let material_center = Material::lambertian(color(0.1, 0.2, 0.5));
+    let material_left   = Material::dielectric(1.5);
+    let material_right  = Material::metal(color(0.8, 0.6, 0.2), 0.0);
     let sphere1 = Sphere { center: Vec3{x:  0.0,  y: -100.5, z: -1.0}, radius: 100.0, mat: material_ground.clone()};
     let sphere2 = Sphere { center: Vec3{x:  0.0,  y:    0.0, z: -1.0}, radius:   0.5, mat: material_center.clone()};
     let sphere3 = Sphere { center: Vec3{x: -1.0,  y:    0.0, z: -1.0}, radius:   0.5, mat: material_left.clone()};
@@ -85,8 +85,8 @@ fn world1() -> HittableList {
 fn world2() -> HittableList {
     // World 2
     let r = f64::cos(std::f64::consts::PI / 4.0);
-    let material_left   = Rc::new(Lambertian {albedo: color(0.0, 0.0, 1.0)});
-    let material_right  = Rc::new(Lambertian {albedo: color(1.0, 0.0, 0.0)});
+    let material_left   = Material::lambertian(color(0.0, 0.0, 1.0));
+    let material_right  = Material::lambertian(color(1.0, 0.0, 0.0));
     let sphere1 = Sphere { center: Vec3{x: -r, y: 0.0, z: -1.0},  radius: r, mat: material_left.clone()};
     let sphere2 = Sphere { center: Vec3{x:  r, y: 0.0, z: -1.0},  radius: r, mat: material_right.clone()};
     let mut world = HittableList::new();
@@ -99,7 +99,7 @@ fn world2() -> HittableList {
 fn random_world() -> HittableList {
     let mut rng = SmallRng::from_entropy();
     let mut world = HittableList::new();
-    let material_ground = Rc::new(Lambertian{albedo: color(0.5, 0.5, 0.5)});
+    let material_ground = Material::lambertian(color(0.5, 0.5, 0.5));
     world.add(sphere(Vec3::new(0.0, -1000.0, 0.0), 1000.0, material_ground));
 
     for a in -GRID_SIZE..GRID_SIZE {
@@ -116,19 +116,19 @@ fn random_world() -> HittableList {
                 if choose_mat < 0.8 {
                     // diffuse
                     let albedo = Color::random(0.0, 1.0) * Color::random(0.0, 1.0);
-                    let material = Rc::new(Lambertian{albedo: albedo});
+                    let material = Material::lambertian(albedo);
                     world.add(sphere(center, 0.2, material));
 
                 } else if choose_mat < 0.95 {
                     // metal
                     let albedo = Color::random(0.5, 1.0);
                     let fuzz = rng.gen_range(0.0, 0.5);
-                    let material = Rc::new(Metal{albedo: albedo, fuzz: fuzz});
+                    let material = Material::metal(albedo, fuzz);
                     world.add(sphere(center, 0.2, material));
 
                 } else {
                     // glass
-                    let material = Rc::new(Dielectric{ir: 1.5});
+                    let material = Material::dielectric(1.5);
                     world.add(sphere(center, 0.2, material));
                 }
 
@@ -136,9 +136,9 @@ fn random_world() -> HittableList {
         }
     }
 
-    world.add(sphere(Vec3::new(0.0, 1.0, 0.0),  1.0, Rc::new(Dielectric{ir: 1.5})));
-    world.add(sphere(Vec3::new(-4.0, 1.0, 0.0), 1.0, Rc::new(Lambertian{albedo: color(0.4, 0.2, 0.1)})));
-    world.add(sphere(Vec3::new(4.0, 1.0, 0.0),  1.0, Rc::new(Metal{albedo: color(0.7, 0.6, 0.5), fuzz: 0.0})));
+    world.add(sphere(Vec3::new(0.0, 1.0, 0.0),  1.0, Material::dielectric(1.5)));
+    world.add(sphere(Vec3::new(-4.0, 1.0, 0.0), 1.0, Material::lambertian(color(0.4, 0.2, 0.1))));
+    world.add(sphere(Vec3::new(4.0, 1.0, 0.0),  1.0, Material::metal(color(0.7, 0.6, 0.5), 0.0)));
     return world;
 }
 

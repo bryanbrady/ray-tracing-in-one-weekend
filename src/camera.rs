@@ -3,6 +3,7 @@ use crate::ray::Ray;
 use crate::vec::Vec3;
 use crate::util::*;
 
+#[derive(Debug, Clone, Copy)]
 pub struct Camera {
     origin: Vec3,
     horizontal: Vec3,

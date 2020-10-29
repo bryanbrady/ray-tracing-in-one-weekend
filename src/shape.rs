@@ -4,8 +4,7 @@ use crate::ray::Ray;
 use crate::sphere::Sphere;
 use crate::vec::Vec3;
 
-use std::rc::Rc;
-
+#[derive(Debug,Clone)]
 pub enum Shape {
     Sphere(Sphere)
 }
@@ -21,7 +20,7 @@ impl Hittable for Shape {
 }
 
 #[allow(dead_code)]
-pub fn sphere(center: Vec3, radius: f64, mat: Rc<dyn Material>) -> Shape {
+pub fn sphere(center: Vec3, radius: f64, mat: Material) -> Shape {
     Shape::Sphere(Sphere{
         center: center,
         radius: radius,
