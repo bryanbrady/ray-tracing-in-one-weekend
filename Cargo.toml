@@ -8,6 +8,8 @@ edition = "2018"
 
 [dependencies]
 rand = "0.7"
+threadpool = "1.8.1"
+num_cpus = "1.13.0"
 #cpuprofiler = "0.0.4"
 
 [features]

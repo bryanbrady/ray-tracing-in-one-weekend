@@ -9,6 +9,7 @@ mod vec;
 mod util;
 
 use std::io::{self};
+use std::sync::mpsc::{channel,RecvError};
 
 use rand::prelude::*;
 use rand::rngs::SmallRng;
@@ -26,6 +27,8 @@ use shape::sphere;
 use sphere::Sphere;
 use vec::Vec3;
 
+extern crate threadpool;
+use threadpool::ThreadPool;
 // extern crate cpuprofiler;
 // use cpuprofiler::PROFILER;
 
@@ -180,7 +183,7 @@ fn camera_final() -> Camera {
     return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus);
 }
 
-fn main() -> io::Result<()> {
+fn main() -> Result<(), RecvError> {
     // PROFILER.lock().unwrap().start("./rt.profile").expect("Couldn't start");
 
     // Pixels
@@ -192,10 +195,16 @@ fn main() -> io::Result<()> {
     // Camera
     let camera = camera_final();
 
-    let mut rng = SmallRng::from_entropy();
+    // Parallelize
+    let pool = ThreadPool::new(num_cpus::get());
+    let (tx, rx) = channel();
+
+    // Do it
     for h in 0..IMAGE_HEIGHT {
-        eprintln!("Scanlines remaining: {}", (IMAGE_HEIGHT-h));
-        for w in 0..IMAGE_WIDTH {
+        let tx = tx.clone();
+        let myworld = world.clone();
+        pool.execute(move || for w in 0..IMAGE_WIDTH {
+            let mut rng = SmallRng::from_entropy();
             let mut pixel_color = Color{r: 0.0, g: 0.0, b: 0.0};
             for _i in 0..SAMPLES_PER_PIXEL {
                 let ur: f64 = rng.gen();
@@ -203,16 +212,22 @@ fn main() -> io::Result<()> {
                 let u: f64 = ((w as f64) + ur) / ((IMAGE_WIDTH-1) as f64);
                 let v: f64 = ((h as f64) + vr) / ((IMAGE_HEIGHT-1) as f64);
                 let r = camera.get_ray(u, v, &mut rng);
-                pixel_color += ray_color(r, &world, MAX_DEPTH, &mut rng);
+                pixel_color += ray_color(r, &myworld, MAX_DEPTH, &mut rng);
             }
-            pixels[((IMAGE_HEIGHT-h-1)*IMAGE_WIDTH + w) as usize] = pixel_color;
-        }
+            tx.send((w,h,pixel_color)).expect("Could not send data!");
+        });
+    }
+
+    for _ in 0..(IMAGE_HEIGHT * IMAGE_WIDTH) {
+        let (w, h, pixel) = rx.recv()?;
+        pixels[((IMAGE_HEIGHT-h-1)*IMAGE_WIDTH + w) as usize] = pixel;
     }
 
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
     for pixel in pixels {
         write_color(&mut io::stdout(), pixel, SAMPLES_PER_PIXEL).expect("Unable to write data");
     }
+
     eprintln!("Done!\n");
     // PROFILER.lock().unwrap().stop().expect("Couldn't stop");
     Ok(())
