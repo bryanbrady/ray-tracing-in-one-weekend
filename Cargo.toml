@@ -8,6 +8,7 @@ edition = "2018"
 
 [dependencies]
 rand = "0.7"
+#cpuprofiler = "0.0.4"
 
 [features]
 default = ["rand/small_rng"]

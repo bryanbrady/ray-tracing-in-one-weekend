@@ -26,6 +26,8 @@ use shape::sphere;
 use sphere::Sphere;
 use vec::Vec3;
 
+// extern crate cpuprofiler;
+// use cpuprofiler::PROFILER;
 
 // Image
 const ASPECT_RATIO: f64 = 3.0 / 2.0;
@@ -179,6 +181,8 @@ fn camera_final() -> Camera {
 }
 
 fn main() -> io::Result<()> {
+    // PROFILER.lock().unwrap().start("./rt.profile").expect("Couldn't start");
+
     // Pixels
     let mut pixels = vec![color(0.0, 0.0, 0.0); PIXELS as usize];
 
@@ -210,5 +214,6 @@ fn main() -> io::Result<()> {
         write_color(&mut io::stdout(), pixel, SAMPLES_PER_PIXEL).expect("Unable to write data");
     }
     eprintln!("Done!\n");
+    // PROFILER.lock().unwrap().stop().expect("Couldn't stop");
     Ok(())
 }
