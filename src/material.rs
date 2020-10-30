@@ -11,7 +11,7 @@ pub struct Scatter {
 }
 
 pub trait MaterialScatter{
-    fn scatter(&self, ray: &Ray, hit: &HitRecord) -> Option<Scatter>;
+    fn scatter(&self, ray: &Ray, hit: &HitRecord, rng: &mut SmallRng) -> Option<Scatter>;
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -55,18 +55,18 @@ impl Material {
 }
 
 impl MaterialScatter for Material {
-    fn scatter(&self, ray: &Ray, hit: &HitRecord) -> Option<Scatter> {
+    fn scatter(&self, ray: &Ray, hit: &HitRecord, rng: &mut SmallRng) -> Option<Scatter> {
         match self {
-            Material::Lambertian(m) => { m.scatter(ray, hit) },
-            Material::Metal(m)      => { m.scatter(ray, hit) },
-            Material::Dielectric(m) => { m.scatter(ray, hit) }
+            Material::Lambertian(m) => { m.scatter(ray, hit, rng) },
+            Material::Metal(m)      => { m.scatter(ray, hit, rng) },
+            Material::Dielectric(m) => { m.scatter(ray, hit, rng) }
         }
     }
 }
 
 impl MaterialScatter for Lambertian {
-    fn scatter(&self, _ray: &Ray, hit: &HitRecord) -> Option<Scatter> {
-        let scatter_direction = hit.normal + Vec3::random_unit_vector();
+    fn scatter(&self, _ray: &Ray, hit: &HitRecord, rng: &mut SmallRng) -> Option<Scatter> {
+        let scatter_direction = hit.normal + Vec3::random_unit_vector(rng);
         let scattered = Ray { origin: hit.point, direction: scatter_direction };
         let attenuation = self.albedo;
         Some(Scatter {
@@ -77,11 +77,11 @@ impl MaterialScatter for Lambertian {
 }
 
 impl MaterialScatter for Metal {
-    fn scatter(&self, _ray: &Ray, hit: &HitRecord) -> Option<Scatter> {
+    fn scatter(&self, _ray: &Ray, hit: &HitRecord, rng: &mut SmallRng) -> Option<Scatter> {
         let reflected = Vec3::reflect(_ray.direction.unit_vector(), hit.normal);
         let scattered = Ray {
             origin: hit.point,
-            direction: reflected + self.fuzz * Vec3::random_in_unit_sphere()
+            direction: reflected + self.fuzz * Vec3::random_in_unit_sphere(rng)
         };
         let attenuation = self.albedo;
         if scattered.direction.dot(hit.normal) > 0.0 {
@@ -100,13 +100,13 @@ impl Dielectric {
 }
 
 impl MaterialScatter for Dielectric {
-    fn scatter(&self, _ray: &Ray, hit: &HitRecord) -> Option<Scatter> {
+    fn scatter(&self, _ray: &Ray, hit: &HitRecord, rng: &mut SmallRng) -> Option<Scatter> {
         let refraction_ratio = if hit.front_face { 1.0 / self.ir } else { self.ir };
         let unit_direction = _ray.direction.unit_vector();
         let cos_theta = f64::min(-unit_direction.dot(hit.normal), 1.0);
         let sin_theta = f64::sqrt(1.0 - cos_theta * cos_theta);
         let cannot_refract = refraction_ratio * sin_theta > 1.0
-                          || Dielectric::reflectance(cos_theta, refraction_ratio) > SmallRng::from_entropy().gen();
+                          || Dielectric::reflectance(cos_theta, refraction_ratio) > rng.gen();
         let direction = if cannot_refract {
             Vec3::reflect(unit_direction, hit.normal)
         } else {

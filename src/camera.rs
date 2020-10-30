@@ -2,6 +2,7 @@
 use crate::ray::Ray;
 use crate::vec::Vec3;
 use crate::util::*;
+use rand::rngs::SmallRng;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Camera {
@@ -48,10 +49,8 @@ impl Camera {
         }
     }
 
-    pub fn get_ray(&self, s: f64, t: f64) -> Ray {
-        //let rd = Vec3::new(0.1, 0.0, 0.0);
-        //let rd = Vec3::random_in_unit_disk();
-        let rd = self.lens_radius * Vec3::random_in_unit_disk();
+    pub fn get_ray(&self, s: f64, t: f64, rng: &mut SmallRng) -> Ray {
+        let rd = self.lens_radius * Vec3::random_in_unit_disk(rng);
         let offset = self.u * rd.x + self.v * rd.y;
         Ray{
             origin: self.origin + offset,

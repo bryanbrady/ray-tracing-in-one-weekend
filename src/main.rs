@@ -9,6 +9,7 @@ mod vec;
 mod util;
 
 use std::io::{self};
+
 use rand::prelude::*;
 use rand::rngs::SmallRng;
 
@@ -25,24 +26,26 @@ use shape::sphere;
 use sphere::Sphere;
 use vec::Vec3;
 
+
 // Image
 const ASPECT_RATIO: f64 = 3.0 / 2.0;
 const IMAGE_WIDTH: u32 = 300;
 const IMAGE_HEIGHT: u32 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u32;
+const PIXELS: u32 = IMAGE_WIDTH * IMAGE_HEIGHT;
 const SAMPLES_PER_PIXEL: u64 = 500;
 const MAX_DEPTH: u32 = 50;
-const GRID_SIZE: i32 = 2;
+const GRID_SIZE: i32 = 11;
 
 #[allow(dead_code)]
-fn ray_color(ray : Ray, world: &HittableList, depth: u32) -> Color {
+fn ray_color(ray : Ray, world: &HittableList, depth: u32, rng: &mut SmallRng) -> Color {
     if depth <= 0 {
         return color(0.0, 0.0, 0.0)
     }
     match world.hit(&ray, 0.0001, std::f64::INFINITY) {
         Some(hit) => {
-            match hit.mat.scatter(&ray, &hit) {
+            match hit.mat.scatter(&ray, &hit, rng) {
                 Some(scatter) => {
-                    return scatter.attenuation * ray_color(scatter.scattered, world, depth-1);
+                    return scatter.attenuation * ray_color(scatter.scattered, world, depth-1, rng);
                 }
                 None => {
                     return color(0.0, 0.0, 0.0);
@@ -176,6 +179,8 @@ fn camera_final() -> Camera {
 }
 
 fn main() -> io::Result<()> {
+    // Pixels
+    let mut pixels = vec![color(0.0, 0.0, 0.0); PIXELS as usize];
 
     // World
     let world = random_world();
@@ -184,9 +189,8 @@ fn main() -> io::Result<()> {
     let camera = camera_final();
 
     let mut rng = SmallRng::from_entropy();
-    println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
-    for h in  (0..IMAGE_HEIGHT).rev() {
-        eprintln!("Scanlines remaining: {}", h);
+    for h in 0..IMAGE_HEIGHT {
+        eprintln!("Scanlines remaining: {}", (IMAGE_HEIGHT-h));
         for w in 0..IMAGE_WIDTH {
             let mut pixel_color = Color{r: 0.0, g: 0.0, b: 0.0};
             for _i in 0..SAMPLES_PER_PIXEL {
@@ -194,12 +198,16 @@ fn main() -> io::Result<()> {
                 let vr: f64 = rng.gen();
                 let u: f64 = ((w as f64) + ur) / ((IMAGE_WIDTH-1) as f64);
                 let v: f64 = ((h as f64) + vr) / ((IMAGE_HEIGHT-1) as f64);
-                let r = camera.get_ray(u, v);
-                pixel_color += ray_color(r, &world, MAX_DEPTH);
+                let r = camera.get_ray(u, v, &mut rng);
+                pixel_color += ray_color(r, &world, MAX_DEPTH, &mut rng);
             }
-
-            write_color(&mut io::stdout(), pixel_color, SAMPLES_PER_PIXEL)?;
+            pixels[((IMAGE_HEIGHT-h-1)*IMAGE_WIDTH + w) as usize] = pixel_color;
         }
+    }
+
+    println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
+    for pixel in pixels {
+        write_color(&mut io::stdout(), pixel, SAMPLES_PER_PIXEL).expect("Unable to write data");
     }
     eprintln!("Done!\n");
     Ok(())

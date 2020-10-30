@@ -177,8 +177,7 @@ impl Vec3 {
         return r_out_perp + r_out_parallel;
     }
 
-    pub fn random(min: f64, max: f64) -> Vec3 {
-        let mut rng = SmallRng::from_entropy();
+    pub fn random(min: f64, max: f64, rng: &mut SmallRng) -> Vec3 {
         Vec3{
             x: rng.gen_range(min,max),
             y: rng.gen_range(min,max),
@@ -186,9 +185,9 @@ impl Vec3 {
         }
     }
 
-    pub fn random_in_unit_sphere() -> Vec3 {
+    pub fn random_in_unit_sphere(rng: &mut SmallRng) -> Vec3 {
         loop {
-            let u = Vec3::random(-1.0, 1.0);
+            let u = Vec3::random(-1.0, 1.0, rng);
             if u.length_squared() < 1.0 {
                 return u;
             }
@@ -196,8 +195,7 @@ impl Vec3 {
         }
     }
 
-    pub fn random_in_unit_disk() -> Vec3 {
-        let mut rng = SmallRng::from_entropy();
+    pub fn random_in_unit_disk(rng: &mut SmallRng) -> Vec3 {
         loop {
             let p = Vec3 {
                 x: rng.gen_range(-1.0, 1.0),
@@ -212,16 +210,15 @@ impl Vec3 {
     }
 
     // Lambertian distribution
-    pub fn random_unit_vector() -> Vec3 {
-        let mut rng = SmallRng::from_entropy();
+    pub fn random_unit_vector(rng: &mut SmallRng) -> Vec3 {
         let a = rng.gen_range(0.0, 2.0*std::f64::consts::PI);
         let z = rng.gen_range(-1.0, 1.0);
         let r = f64::sqrt(1.0 - z*z);
         return Vec3::new(r*f64::cos(a), r*f64::sin(a), z);
     }
 
-    pub fn random_in_hemisphere(normal: &Vec3) -> Vec3 {
-        let r = Vec3::random_in_unit_sphere();
+    pub fn random_in_hemisphere(normal: &Vec3, rng: &mut SmallRng) -> Vec3 {
+        let r = Vec3::random_in_unit_sphere(rng);
         if r.dot(*normal) > 0.0 {
             return r;
         } else {
