@@ -34,12 +34,12 @@ use threadpool::ThreadPool;
 
 // Image
 const ASPECT_RATIO: f64 = 3.0 / 2.0;
-const IMAGE_WIDTH: u32 = 300;
+const IMAGE_WIDTH: u32 = 1200;
 const IMAGE_HEIGHT: u32 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u32;
 const PIXELS: u32 = IMAGE_WIDTH * IMAGE_HEIGHT;
 const SAMPLES_PER_PIXEL: u64 = 500;
 const MAX_DEPTH: u32 = 50;
-const GRID_SIZE: i32 = 11;
+const GRID_SIZE: i32 = 5;
 
 #[allow(dead_code)]
 fn ray_color(ray : Ray, world: &HittableList, depth: u32, rng: &mut SmallRng) -> Color {
@@ -139,7 +139,6 @@ fn random_world() -> HittableList {
                     let material = Material::dielectric(1.5);
                     world.add(sphere(center, 0.2, material));
                 }
-
             }
         }
     }
@@ -147,6 +146,56 @@ fn random_world() -> HittableList {
     world.add(sphere(Vec3::new(0.0, 1.0, 0.0),  1.0, Material::dielectric(1.5)));
     world.add(sphere(Vec3::new(-4.0, 1.0, 0.0), 1.0, Material::lambertian(color(0.4, 0.2, 0.1))));
     world.add(sphere(Vec3::new(4.0, 1.0, 0.0),  1.0, Material::metal(color(0.7, 0.6, 0.5), 0.0)));
+    return world;
+}
+
+#[allow(dead_code)]
+fn random_world2() -> HittableList {
+    let mut rng = SmallRng::from_entropy();
+    let mut world = HittableList::new();
+
+    //let material_ground = Material::metal(color(0.0, 0.0, 0.0), 0.0);
+    let material_ground = Material::lambertian(color(0.0, 0.0, 0.0));
+    world.add(sphere(Vec3::new(0.0, -1100.0, 0.0), 1000.0, material_ground));
+
+    for a in -GRID_SIZE..GRID_SIZE {
+        for b in -GRID_SIZE..GRID_SIZE {
+            for c in -GRID_SIZE..GRID_SIZE {
+                let choose_mat: f64 = rng.gen::<f64>();
+                let center = Vec3 {
+                    x: (a as f64) + 1.5 * rng.gen::<f64>(),
+                    y: (b as f64) + 1.5 * rng.gen::<f64>(),
+                    z: (c as f64) + 1.5 * rng.gen::<f64>()
+                };
+                let some_point = Vec3::new(4.0, 0.2, 0.0);
+
+                if (center - some_point).length() > 0.9 {
+                    if choose_mat < 0.2 {
+                        // diffuse
+                        let albedo = Color::random(0.0, 1.0) * Color::random(0.0, 1.0);
+                        let material = Material::lambertian(albedo);
+                        world.add(sphere(center, 0.2, material));
+
+                    } else if choose_mat < 0.75 {
+                        // metal
+                        let albedo = Color::random(0.5, 1.0);
+                        let fuzz = rng.gen_range(0.0, 0.5);
+                        let material = Material::metal(albedo, fuzz);
+                        world.add(sphere(center, 0.2, material));
+
+                    } else {
+                        // glass
+                        let material = Material::dielectric(1.5);
+                        world.add(sphere(center, 0.2, material));
+                    }
+                }
+            }
+        }
+    }
+
+    // world.add(sphere(Vec3::new(0.0, 1.0, 0.0),  1.0, Material::dielectric(1.5)));
+    // world.add(sphere(Vec3::new(-4.0, 1.0, 0.0), 1.0, Material::lambertian(color(0.4, 0.2, 0.1))));
+    // world.add(sphere(Vec3::new(4.0, 1.0, 0.0),  1.0, Material::metal(color(0.7, 0.6, 0.5), 0.0)));
     return world;
 }
 
@@ -179,7 +228,18 @@ fn camera_final() -> Camera {
     let lookat= Vec3::new(0.0, 0.0, 0.0);
     let vup = Vec3::new(0.0, 1.0, 0.0);
     let aperture = 0.1;
-    let dist_to_focus = 10.0;
+    let dist_to_focus = 12.0;
+    return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus);
+}
+
+#[allow(dead_code)]
+fn camera_other() -> Camera {
+    let vfov: f64 = 20.0;
+    let lookfrom = Vec3::new(1.0, 20.0, 1.0);
+    let lookat= Vec3::new(0.0, 0.0, 0.0);
+    let vup = Vec3::new(0.0, 1.0, 0.0);
+    let aperture = 0.1;
+    let dist_to_focus = 18.0;
     return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus);
 }
 
@@ -190,16 +250,18 @@ fn main() -> Result<(), RecvError> {
     let mut pixels = vec![color(0.0, 0.0, 0.0); PIXELS as usize];
 
     // World
-    let world = random_world();
+    let world = random_world2();
 
     // Camera
-    let camera = camera_final();
+    //let camera = camera_final();
+    let camera = camera_other();
 
     // Parallelize
     let pool = ThreadPool::new(num_cpus::get());
     let (tx, rx) = channel();
 
     // Do it
+    eprintln!("Tracing rays....");
     for h in 0..IMAGE_HEIGHT {
         let tx = tx.clone();
         let myworld = world.clone();
