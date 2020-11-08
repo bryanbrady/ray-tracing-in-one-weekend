@@ -67,8 +67,7 @@ impl ops::Mul<Color> for Color {
 }
 
 impl Color {
-    pub fn random(min: f64, max: f64) -> Color {
-        let mut rng = SmallRng::from_entropy();
+    pub fn random(min: f64, max: f64, rng: &mut SmallRng) -> Color {
         Color {
             r: rng.gen_range(min,max),
             g: rng.gen_range(min,max),

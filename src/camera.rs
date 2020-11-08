@@ -2,6 +2,7 @@
 use crate::ray::Ray;
 use crate::vec::Vec3;
 use crate::util::*;
+use rand::prelude::*;
 use rand::rngs::SmallRng;
 
 #[derive(Debug, Clone, Copy)]
@@ -12,7 +13,9 @@ pub struct Camera {
     lower_left_corner: Vec3,
     u: Vec3,
     v: Vec3,
-    lens_radius: f64
+    lens_radius: f64,
+    time0: f64,
+    time1: f64
 }
 
 impl Camera {
@@ -22,7 +25,9 @@ impl Camera {
                vfov: f64,
                aspect_ratio: f64,
                aperture: f64,
-               focus_dist: f64)
+               focus_dist: f64,
+               t0: f64,
+               t1: f64)
                -> Camera {
 
         let theta = degrees_to_radians(vfov);
@@ -45,7 +50,9 @@ impl Camera {
             lower_left_corner: origin - horizontal/2.0 - vertical/2.0 - focus_dist*w,
             u: u,
             v: v,
-            lens_radius: aperture / 2.0
+            lens_radius: aperture / 2.0,
+            time0: t0,
+            time1: t1
         }
     }
 
@@ -54,7 +61,8 @@ impl Camera {
         let offset = self.u * rd.x + self.v * rd.y;
         Ray{
             origin: self.origin + offset,
-            direction: &self.lower_left_corner + s*self.horizontal + t*self.vertical - self.origin - offset
+            direction: &self.lower_left_corner + s*self.horizontal + t*self.vertical - self.origin - offset,
+            time: if self.time0 != self.time1 { rng.gen_range(self.time0, self.time1) } else {self.time0}
         }
     }
 }

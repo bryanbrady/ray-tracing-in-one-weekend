@@ -23,8 +23,8 @@ use material::{MaterialScatter};
 use material::Material;
 use ray::Ray;
 use shape::Shape;
-use shape::sphere;
-use sphere::Sphere;
+use shape::{moving_sphere, sphere};
+use sphere::{Sphere};
 use vec::Vec3;
 
 extern crate threadpool;
@@ -33,13 +33,13 @@ use threadpool::ThreadPool;
 // use cpuprofiler::PROFILER;
 
 // Image
-const ASPECT_RATIO: f64 = 3.0 / 2.0;
-const IMAGE_WIDTH: u32 = 1200;
+const ASPECT_RATIO: f64 = 16.0 / 9.0;
+const IMAGE_WIDTH: u32 = 400;
 const IMAGE_HEIGHT: u32 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u32;
 const PIXELS: u32 = IMAGE_WIDTH * IMAGE_HEIGHT;
-const SAMPLES_PER_PIXEL: u64 = 500;
+const SAMPLES_PER_PIXEL: u64 = 100;
 const MAX_DEPTH: u32 = 50;
-const GRID_SIZE: i32 = 5;
+const GRID_SIZE: i32 = 11;
 
 #[allow(dead_code)]
 fn ray_color(ray : Ray, world: &HittableList, depth: u32, rng: &mut SmallRng) -> Color {
@@ -104,6 +104,52 @@ fn world2() -> HittableList {
 }
 
 #[allow(dead_code)]
+fn random_world_original() -> HittableList {
+    let mut rng = SmallRng::from_entropy();
+    let mut world = HittableList::new();
+    let material_ground = Material::lambertian(color(0.5, 0.5, 0.5));
+    world.add(sphere(Vec3::new(0.0, -1000.0, 0.0), 1000.0, material_ground));
+
+    for a in -GRID_SIZE..GRID_SIZE {
+        for b in -GRID_SIZE..GRID_SIZE {
+            let choose_mat: f64 = rng.gen::<f64>();
+            let center = Vec3 {
+                x: (a as f64) + 0.9 * rng.gen::<f64>(),
+                y: 0.2,
+                z: (b as f64) + 0.9 * rng.gen::<f64>()
+            };
+            let some_point = Vec3::new(4.0, 0.2, 0.0);
+
+            if (center - some_point).length() > 0.9 {
+                if choose_mat < 0.8 {
+                    // diffuse
+                    let albedo = Color::random(0.0, 1.0, &mut rng) * Color::random(0.0, 1.0, &mut rng);
+                    let material = Material::lambertian(albedo);
+                    world.add(sphere(center, 0.2, material));
+
+                } else if choose_mat < 0.95 {
+                    // metal
+                    let albedo = Color::random(0.5, 1.0, &mut rng);
+                    let fuzz = rng.gen_range(0.0, 0.5);
+                    let material = Material::metal(albedo, fuzz);
+                    world.add(sphere(center, 0.2, material));
+
+                } else {
+                    // glass
+                    let material = Material::dielectric(1.5);
+                    world.add(sphere(center, 0.2, material));
+                }
+            }
+        }
+    }
+
+    world.add(sphere(Vec3::new(0.0, 1.0, 0.0),  1.0, Material::dielectric(1.5)));
+    world.add(sphere(Vec3::new(-4.0, 1.0, 0.0), 1.0, Material::lambertian(color(0.4, 0.2, 0.1))));
+    world.add(sphere(Vec3::new(4.0, 1.0, 0.0),  1.0, Material::metal(color(0.7, 0.6, 0.5), 0.0)));
+    return world;
+}
+
+#[allow(dead_code)]
 fn random_world() -> HittableList {
     let mut rng = SmallRng::from_entropy();
     let mut world = HittableList::new();
@@ -123,13 +169,14 @@ fn random_world() -> HittableList {
             if (center - some_point).length() > 0.9 {
                 if choose_mat < 0.8 {
                     // diffuse
-                    let albedo = Color::random(0.0, 1.0) * Color::random(0.0, 1.0);
+                    let albedo = Color::random(0.0, 1.0, &mut rng) * Color::random(0.0, 1.0, &mut rng);
                     let material = Material::lambertian(albedo);
-                    world.add(sphere(center, 0.2, material));
+                    let center2 = center +  Vec3::new(0.0, rng.gen_range(0.0, 0.25), 0.0);
+                    world.add(moving_sphere(center, center2, 0.0, 1.0, 0.2, material));
 
                 } else if choose_mat < 0.95 {
                     // metal
-                    let albedo = Color::random(0.5, 1.0);
+                    let albedo = Color::random(0.5, 1.0, &mut rng);
                     let fuzz = rng.gen_range(0.0, 0.5);
                     let material = Material::metal(albedo, fuzz);
                     world.add(sphere(center, 0.2, material));
@@ -172,13 +219,13 @@ fn random_world2() -> HittableList {
                 if (center - some_point).length() > 0.9 {
                     if choose_mat < 0.2 {
                         // diffuse
-                        let albedo = Color::random(0.0, 1.0) * Color::random(0.0, 1.0);
+                        let albedo = Color::random(0.0, 1.0, &mut rng) * Color::random(0.0, 1.0, &mut rng);
                         let material = Material::lambertian(albedo);
                         world.add(sphere(center, 0.2, material));
 
                     } else if choose_mat < 0.75 {
                         // metal
-                        let albedo = Color::random(0.5, 1.0);
+                        let albedo = Color::random(0.5, 1.0, &mut rng);
                         let fuzz = rng.gen_range(0.0, 0.5);
                         let material = Material::metal(albedo, fuzz);
                         world.add(sphere(center, 0.2, material));
@@ -207,7 +254,7 @@ fn camera2() -> Camera {
     let vup = Vec3::new(0.0, 1.0, 0.0);
     let aperture = 2.0;
     let dist_to_focus = (lookfrom-lookat).length();
-    return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus);
+    return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus, 0.0, 0.0);
 }
 
 #[allow(dead_code)]
@@ -218,7 +265,7 @@ fn camera3() -> Camera {
     let vup = Vec3::new(0.0, 1.0, 0.0);
     let aperture = 0.1;
     let dist_to_focus = 10.0;
-    return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus);
+    return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus, 0.0, 0.0);
 }
 
 #[allow(dead_code)]
@@ -229,7 +276,18 @@ fn camera_final() -> Camera {
     let vup = Vec3::new(0.0, 1.0, 0.0);
     let aperture = 0.1;
     let dist_to_focus = 12.0;
-    return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus);
+    return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus, 0.0, 0.0);
+}
+
+#[allow(dead_code)]
+fn camera_blur() -> Camera {
+    let vfov: f64 = 20.0;
+    let lookfrom = Vec3::new(13.0, 2.0, 3.0);
+    let lookat= Vec3::new(0.0, 0.0, 0.0);
+    let vup = Vec3::new(0.0, 1.0, 0.0);
+    let aperture = 0.1;
+    let dist_to_focus = 10.0;
+    return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus, 0.0, 1.0);
 }
 
 #[allow(dead_code)]
@@ -240,7 +298,7 @@ fn camera_other() -> Camera {
     let vup = Vec3::new(0.0, 1.0, 0.0);
     let aperture = 0.1;
     let dist_to_focus = 18.0;
-    return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus);
+    return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus, 0.0, 0.0);
 }
 
 fn main() -> Result<(), RecvError> {
@@ -250,14 +308,13 @@ fn main() -> Result<(), RecvError> {
     let mut pixels = vec![color(0.0, 0.0, 0.0); PIXELS as usize];
 
     // World
-    let world = random_world2();
+    let world = random_world();
 
     // Camera
-    //let camera = camera_final();
-    let camera = camera_other();
+    let camera = camera_blur();
 
     // Parallelize
-    let pool = ThreadPool::new(num_cpus::get());
+    let pool = ThreadPool::new(num_cpus::get() - 1);
     let (tx, rx) = channel();
 
     // Do it
