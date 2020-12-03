@@ -1,10 +1,12 @@
+mod aabb;
+// mod bvh;
 mod camera;
 mod color;
 mod hittable;
+mod hittable_list;
 mod material;
 mod ray;
 mod scenes;
-mod shape;
 mod sphere;
 mod vec;
 mod util;
@@ -15,10 +17,10 @@ use std::sync::mpsc::{channel,RecvError};
 use rand::prelude::*;
 use rand::rngs::SmallRng;
 
-use color::Color;
-use color::color;
-use color::write_color;
-use hittable::{Hittable,HittableList};
+use aabb::Aabb;
+// use bvh::BvhNode;
+use color::{Color, color, write_color};
+use hittable::{Hittable,Hittables};
 use material::Material;
 use ray::Ray;
 use vec::Vec3;
@@ -52,7 +54,7 @@ const MAX_DEPTH: u32 = 50;
 const GRID_SIZE: i32 = 11;
 
 #[allow(dead_code)]
-fn ray_color(ray : Ray, world: &HittableList, depth: u32, rng: &mut SmallRng) -> Color {
+fn ray_color(ray: Ray, world: &Hittables, depth: u32, rng: &mut SmallRng) -> Color {
     if depth <= 0 {
         return color(0.0, 0.0, 0.0)
     }

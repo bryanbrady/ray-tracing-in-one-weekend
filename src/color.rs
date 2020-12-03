@@ -12,6 +12,16 @@ pub struct Color {
     pub b: f64
 }
 
+impl Default for Color {
+    fn default() -> Color {
+        Color {
+            r: 0.0,
+            g: 0.0,
+            b: 0.0
+        }
+    }
+}
+
 pub fn color(x: f64, y: f64, z: f64) -> Color {
     Color {
         r: x,

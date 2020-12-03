@@ -10,6 +10,10 @@ pub struct Vec3 {
     pub z: f64
 }
 
+impl Default for Vec3 {
+    fn default() -> Vec3 { Vec3::zero() }
+}
+
 // TODO: Learn how to use macros
 // TODO: and if they're needed when Debug,Clone,Copy is used
 
@@ -139,6 +143,10 @@ impl Vec3 {
             y: y,
             z: z
         }
+    }
+
+    pub fn zero() -> Vec3 {
+        Vec3 { x: 0.0, y: 0.0, z: 0.0 }
     }
 
     pub fn length_squared(&self) -> f64 {

@@ -1,4 +1,5 @@
-use crate::hittable::{HitRecord, Hittable};
+use crate::aabb::Aabb;
+use crate::hittable::{HitRecord, Hittable, Hittables};
 use crate::material::MaterialType;
 use crate::ray::Ray;
 use crate::vec::{Vec3};
@@ -12,12 +13,12 @@ pub struct Sphere {
 
 impl Sphere {
     #[allow(dead_code)]
-    pub fn new(center: Vec3, radius: f64, mat: MaterialType) -> Sphere {
-        Sphere{
+    pub fn new(center: Vec3, radius: f64, mat: MaterialType) -> Hittables{
+        Hittables::from(Sphere{
             center: center,
             radius: radius,
             mat: mat
-        }
+        })
     }
 }
 
@@ -70,6 +71,12 @@ impl Hittable for Sphere {
         return None
     }
 
+    fn bounding_box(&self, _time0: f64, _time1: f64) -> Option<Aabb> {
+        Some(Aabb{
+            minimum: self.center - Vec3::new(self.radius, self.radius, self.radius),
+            maximum: self.center + Vec3::new(self.radius, self.radius, self.radius)
+        })
+    }
 }
 
 #[derive(Debug,Clone)]
@@ -84,15 +91,15 @@ pub struct MovingSphere {
 
 impl MovingSphere {
     #[allow(dead_code)]
-    pub fn new(center0: Vec3, center1: Vec3, t0: f64, t1: f64, radius: f64, mat: MaterialType) -> MovingSphere {
-        MovingSphere{
+    pub fn new(center0: Vec3, center1: Vec3, t0: f64, t1: f64, radius: f64, mat: MaterialType) -> Hittables {
+        Hittables::from(MovingSphere{
             center0: center0,
             center1: center1,
             time0: t0,
             time1: t1,
             radius: radius,
             mat: mat
-        }
+        })
     }
 
     pub fn center(&self, time: f64) -> Vec3 {
@@ -150,4 +157,15 @@ impl Hittable for MovingSphere {
         return None
     }
 
+    fn bounding_box(&self, time0: f64, time1: f64) -> Option<Aabb> {
+        let box0 = Aabb {
+            minimum: self.center(time0) - Vec3::new(self.radius, self.radius, self.radius),
+            maximum: self.center(time0) + Vec3::new(self.radius, self.radius, self.radius)
+        };
+        let box1 = Aabb {
+            minimum: self.center(time1) - Vec3::new(self.radius, self.radius, self.radius),
+            maximum: self.center(time1) + Vec3::new(self.radius, self.radius, self.radius)
+        };
+        Some(Aabb::surrounding_box(box0, box1))
+    }
 }

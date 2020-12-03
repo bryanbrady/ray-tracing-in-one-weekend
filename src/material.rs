@@ -24,6 +24,12 @@ pub enum MaterialType {
     Dielectric,
 }
 
+impl Default for MaterialType {
+    fn default() -> MaterialType {
+        Lambertian::new(Color::default())
+    }
+}
+
 // Lambertian
 #[derive(Debug, Clone, Copy)]
 pub struct Lambertian {
