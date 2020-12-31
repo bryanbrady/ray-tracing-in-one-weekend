@@ -1,5 +1,5 @@
 use crate::hittable::{HitRecord, Hittable};
-use crate::material::Material;
+use crate::material::MaterialType;
 use crate::ray::Ray;
 use crate::vec::{Vec3};
 
@@ -7,12 +7,12 @@ use crate::vec::{Vec3};
 pub struct Sphere {
     pub center: Vec3,
     pub radius: f64,
-    pub mat: Material
+    pub mat: MaterialType
 }
 
 impl Sphere {
     #[allow(dead_code)]
-    pub fn new(center: Vec3, radius: f64, mat: Material) -> Sphere {
+    pub fn new(center: Vec3, radius: f64, mat: MaterialType) -> Sphere {
         Sphere{
             center: center,
             radius: radius,
@@ -79,12 +79,12 @@ pub struct MovingSphere {
     pub radius: f64,
     pub time0: f64,
     pub time1: f64,
-    pub mat: Material
+    pub mat: MaterialType
 }
 
 impl MovingSphere {
     #[allow(dead_code)]
-    pub fn new(center0: Vec3, center1: Vec3, t0: f64, t1: f64, radius: f64, mat: Material) -> MovingSphere {
+    pub fn new(center0: Vec3, center1: Vec3, t0: f64, t1: f64, radius: f64, mat: MaterialType) -> MovingSphere {
         MovingSphere{
             center0: center0,
             center1: center1,

@@ -1,5 +1,5 @@
 use crate::hittable::{HitRecord, Hittable};
-use crate::material::Material;
+use crate::material::MaterialType;
 use crate::ray::Ray;
 use crate::sphere::{MovingSphere, Sphere};
 use crate::vec::Vec3;
@@ -22,7 +22,7 @@ impl Hittable for Shape {
 }
 
 #[allow(dead_code)]
-pub fn sphere(center: Vec3, radius: f64, mat: Material) -> Shape {
+pub fn sphere(center: Vec3, radius: f64, mat: MaterialType) -> Shape {
     Shape::Sphere(Sphere{
         center: center,
         radius: radius,
@@ -31,7 +31,7 @@ pub fn sphere(center: Vec3, radius: f64, mat: Material) -> Shape {
 }
 
 #[allow(dead_code)]
-pub fn moving_sphere(center0: Vec3, center1: Vec3, t0: f64, t1: f64, radius: f64, mat: Material) -> Shape {
+pub fn moving_sphere(center0: Vec3, center1: Vec3, t0: f64, t1: f64, radius: f64, mat: MaterialType) -> Shape {
     Shape::MovingSphere(MovingSphere{
         center0: center0,
         center1: center1,
