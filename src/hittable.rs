@@ -1,5 +1,6 @@
 use enum_dispatch::enum_dispatch;
 use crate::aabb::Aabb;
+use crate::bvh::BvhNode;
 use crate::hittable_list::HittableList;
 use crate::material::MaterialType;
 use crate::ray::Ray;
@@ -23,6 +24,8 @@ pub trait Hittable {
 #[enum_dispatch(Hittable)]
 #[derive(Debug, Clone)]
 pub enum Hittables {
+    Aabb,
+    BvhNode,
     MovingSphere,
     Sphere,
     HittableList

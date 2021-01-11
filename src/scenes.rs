@@ -20,7 +20,7 @@ pub struct Scene{
 
 
 #[allow(dead_code)]
-pub fn world1() -> Hittables {
+pub fn world1() -> HittableList {
     // World 1
     let material_ground = Lambertian::new(color(0.8, 0.8, 0.0));
     let material_center = Lambertian::new(color(0.1, 0.2, 0.5));
@@ -37,11 +37,11 @@ pub fn world1() -> Hittables {
     world.add(sphere3);
     world.add(sphere4);
     world.add(sphere5);
-    return Hittables::from(world);
+    return world
 }
 
 #[allow(dead_code)]
-pub fn world2() -> Hittables {
+pub fn world2() -> HittableList {
     // World 2
     let r = f64::cos(std::f64::consts::PI / 4.0);
     let material_left   = Lambertian::new(color(0.0, 0.0, 1.0));
@@ -51,11 +51,11 @@ pub fn world2() -> Hittables {
     let mut world = HittableList{ hittables: Vec::new()};
     world.add(sphere1);
     world.add(sphere2);
-    return Hittables::from(world);
+    return world
 }
 
 #[allow(dead_code)]
-pub fn random_world_original() -> Hittables {
+pub fn random_world_original() -> HittableList {
     let mut rng = SmallRng::from_entropy();
     let mut world = HittableList{ hittables: Vec::new()};
     let material_ground = Lambertian::new(color(0.5, 0.5, 0.5));
@@ -97,11 +97,11 @@ pub fn random_world_original() -> Hittables {
     world.add(Sphere::new(Vec3::new(0.0, 1.0, 0.0),  1.0, Dielectric::new(1.5)));
     world.add(Sphere::new(Vec3::new(-4.0, 1.0, 0.0), 1.0, Lambertian::new(color(0.4, 0.2, 0.1))));
     world.add(Sphere::new(Vec3::new(4.0, 1.0, 0.0),  1.0, Metal::new(color(0.7, 0.6, 0.5), 0.0)));
-    return Hittables::from(world);
+    return world
 }
 
 #[allow(dead_code)]
-pub fn random_world() -> Hittables {
+pub fn random_world() -> HittableList {
     let mut rng = SmallRng::from_entropy();
     let mut world = HittableList{ hittables: Vec::new()};
     let material_ground = Lambertian::new(color(0.5, 0.5, 0.5));
@@ -144,11 +144,11 @@ pub fn random_world() -> Hittables {
     world.add(Sphere::new(Vec3::new(0.0, 1.0, 0.0),  1.0, Dielectric::new(1.5)));
     world.add(Sphere::new(Vec3::new(-4.0, 1.0, 0.0), 1.0, Lambertian::new(color(0.4, 0.2, 0.1))));
     world.add(Sphere::new(Vec3::new(4.0, 1.0, 0.0),  1.0, Metal::new(color(0.7, 0.6, 0.5), 0.0)));
-    return Hittables::from(world);
+    return world
 }
 
 #[allow(dead_code)]
-pub fn random_world2() -> Hittables {
+pub fn random_world2() -> HittableList {
     let mut rng = SmallRng::from_entropy();
     let mut world = HittableList{ hittables: Vec::new()};
 
@@ -190,61 +190,61 @@ pub fn random_world2() -> Hittables {
         }
     }
 
-    return Hittables::from(world);
+    return world
 }
 
 #[allow(dead_code)]
-pub fn camera2() -> Camera {
+pub fn camera2(t0: f64, t1: f64) -> Camera {
     let vfov: f64 = 20.0;
     let lookfrom = Vec3::new(3.0, 3.0, 2.0);
     let lookat= Vec3::new(0.0, 0.0, -1.0);
     let vup = Vec3::new(0.0, 1.0, 0.0);
     let aperture = 2.0;
     let dist_to_focus = (lookfrom-lookat).length();
-    return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus, 0.0, 0.0);
+    return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus, t0, t1);
 }
 
 #[allow(dead_code)]
-pub fn camera3() -> Camera {
+pub fn camera3(t0: f64, t1: f64) -> Camera {
     let vfov: f64 = 20.0;
     let lookfrom = Vec3::new(13.0, 2.0, 3.0);
     let lookat= Vec3::new(0.0, 0.0, 0.0);
     let vup = Vec3::new(0.0, 1.0, 0.0);
     let aperture = 0.1;
     let dist_to_focus = 10.0;
-    return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus, 0.0, 0.0);
+    return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus, t0, t1);
 }
 
 #[allow(dead_code)]
-pub fn camera_final() -> Camera {
+pub fn camera_final(t0: f64, t1: f64) -> Camera {
     let vfov: f64 = 20.0;
     let lookfrom = Vec3::new(13.0, 2.0, 3.0);
     let lookat= Vec3::new(0.0, 0.0, 0.0);
     let vup = Vec3::new(0.0, 1.0, 0.0);
     let aperture = 0.1;
     let dist_to_focus = 12.0;
-    return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus, 0.0, 0.0);
+    return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus, t0, t1);
 }
 
 #[allow(dead_code)]
-pub fn camera_blur() -> Camera {
+pub fn camera_blur(t0: f64, t1: f64) -> Camera {
     let vfov: f64 = 20.0;
     let lookfrom = Vec3::new(13.0, 2.0, 3.0);
     let lookat= Vec3::new(0.0, 0.0, 0.0);
     let vup = Vec3::new(0.0, 1.0, 0.0);
     let aperture = 0.1;
     let dist_to_focus = 10.0;
-    return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus, 0.0, 1.0);
+    return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus, t0, t1);
 }
 
 #[allow(dead_code)]
-pub fn camera_other() -> Camera {
+pub fn camera_other(t0: f64, t1: f64) -> Camera {
     let vfov: f64 = 20.0;
     let lookfrom = Vec3::new(1.0, 20.0, 1.0);
     let lookat= Vec3::new(0.0, 0.0, 0.0);
     let vup = Vec3::new(0.0, 1.0, 0.0);
     let aperture = 0.1;
     let dist_to_focus = 18.0;
-    return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus, 0.0, 0.0);
+    return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus, t0, t1);
 }
 

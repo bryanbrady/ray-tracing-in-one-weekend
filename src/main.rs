@@ -1,5 +1,5 @@
 mod aabb;
-// mod bvh;
+mod bvh;
 mod camera;
 mod color;
 mod hittable;
@@ -18,7 +18,7 @@ use rand::prelude::*;
 use rand::rngs::SmallRng;
 
 use aabb::Aabb;
-// use bvh::BvhNode;
+use bvh::BvhNode;
 use color::{Color, color, write_color};
 use hittable::{Hittable,Hittables};
 use material::Material;
@@ -86,11 +86,14 @@ fn main() -> Result<(), RecvError> {
     // Pixels
     let mut pixels = vec![color(0.0, 0.0, 0.0); PIXELS as usize];
 
+    // Time
+    let (time0, time1) = (0.0, 1.0);
+
     // World
-    let world = random_world();
+    let world = Hittables::from(BvhNode::new(random_world(), time0, time1));
 
     // Camera
-    let camera = camera_blur();
+    let camera = camera3(time0, time1);
 
     // Parallelize
     let pool = ThreadPool::new(num_cpus::get() - 1);
