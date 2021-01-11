@@ -11,6 +11,7 @@ pub struct Aabb {
 }
 
 impl Aabb {
+    #[allow(dead_code)]
     pub fn new(_min: Vec3, _max: Vec3) -> Aabb {
         Aabb { minimum: _min, maximum: _max }
     }

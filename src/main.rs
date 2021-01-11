@@ -17,7 +17,6 @@ use std::sync::mpsc::{channel,RecvError};
 use rand::prelude::*;
 use rand::rngs::SmallRng;
 
-use aabb::Aabb;
 use bvh::BvhNode;
 use color::{Color, color, write_color};
 use hittable::{Hittable,Hittables};
@@ -46,7 +45,7 @@ use threadpool::ThreadPool;
 
 // Image
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
-const IMAGE_WIDTH: u32 = 400;
+const IMAGE_WIDTH: u32 = 1600;
 const IMAGE_HEIGHT: u32 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u32;
 const PIXELS: u32 = IMAGE_WIDTH * IMAGE_HEIGHT;
 const SAMPLES_PER_PIXEL: u64 = 100;
@@ -87,13 +86,13 @@ fn main() -> Result<(), RecvError> {
     let mut pixels = vec![color(0.0, 0.0, 0.0); PIXELS as usize];
 
     // Time
-    let (time0, time1) = (0.0, 1.0);
+    let (time0, time1) = (0.0, 0.0);
 
     // World
     let world = Hittables::from(BvhNode::new(random_world(), time0, time1));
 
     // Camera
-    let camera = camera3(time0, time1);
+    let camera = camera_final(time0, time1);
 
     // Parallelize
     let pool = ThreadPool::new(num_cpus::get() - 1);
