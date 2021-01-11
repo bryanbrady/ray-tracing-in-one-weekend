@@ -22,9 +22,9 @@ impl Aabb {
             z: box0.minimum.z.min(box1.minimum.z)
         };
         let large = Vec3 {
-            x: box0.maximum.x.min(box1.maximum.x),
-            y: box0.maximum.y.min(box1.maximum.y),
-            z: box0.maximum.z.min(box1.maximum.z)
+            x: box0.maximum.x.max(box1.maximum.x),
+            y: box0.maximum.y.max(box1.maximum.y),
+            z: box0.maximum.z.max(box1.maximum.z)
         };
         Aabb { minimum: small, maximum: large }
     }
