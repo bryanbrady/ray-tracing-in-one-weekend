@@ -31,6 +31,7 @@ use crate::scenes::{
     world2,
     random_world_original,
     random_world,
+    random_checkered_world,
     random_world2,
     camera2,
     camera3,
@@ -90,7 +91,7 @@ fn main() -> Result<(), RecvError> {
     let (time0, time1) = (0.0, 0.0);
 
     // World
-    let world = Hittables::from(BvhNode::new(random_world(), time0, time1));
+    let world = Hittables::from(BvhNode::new(random_checkered_world(), time0, time1));
 
     // Camera
     let camera = camera_final(time0, time1);

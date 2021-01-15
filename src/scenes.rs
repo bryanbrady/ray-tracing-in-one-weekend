@@ -4,12 +4,12 @@ use rand::rngs::SmallRng;
 
 use crate::{ASPECT_RATIO, GRID_SIZE};
 use crate::camera::Camera;
-use crate::color::{Color};
+use crate::color::{Color,color};
 use crate::hittable::Hittables;
 use crate::hittable_list::HittableList;
 use crate::material::{Metal, Lambertian, Dielectric};
 use crate::sphere::{Sphere,MovingSphere};
-use crate::texture::{SolidColor};
+use crate::texture::{SolidColor,CheckerTexture};
 use crate::vec::{Vec3,vec3};
 
 
@@ -78,6 +78,61 @@ pub fn random_world_original() -> HittableList {
                     let albedo = Color::random(0.0, 1.0, &mut rng) * Color::random(0.0, 1.0, &mut rng);
                     let material = Lambertian::new(SolidColor::new(albedo.r, albedo.g, albedo.b));
                     world.add(Sphere::new(center, 0.2, material));
+
+                } else if choose_mat < 0.95 {
+                    // metal
+                    let albedo = Color::random(0.5, 1.0, &mut rng);
+                    let fuzz = rng.gen_range(0.0, 0.5);
+                    let material = Metal::new(SolidColor::new(albedo.r, albedo.g, albedo.b), fuzz);
+                    world.add(Sphere::new(center, 0.2, material));
+
+                } else {
+                    // glass
+                    let material = Dielectric::new(1.5);
+                    world.add(Sphere::new(center, 0.2, material));
+                }
+            }
+        }
+    }
+
+    world.add(Sphere::new(vec3(0.0, 1.0, 0.0),  1.0, Dielectric::new(1.5)));
+    world.add(Sphere::new(vec3(-4.0, 1.0, 0.0), 1.0, Lambertian::new(SolidColor::new(0.4, 0.2, 0.1))));
+    world.add(Sphere::new(vec3(4.0, 1.0, 0.0),  1.0, Metal::new(SolidColor::new(0.7, 0.6, 0.5), 0.0)));
+    return world
+}
+
+#[allow(dead_code)]
+pub fn random_checkered_world() -> HittableList {
+    let mut rng = SmallRng::from_entropy();
+    let mut world = HittableList{ hittables: Vec::new()};
+    // let texture_ground = Texture::from(CheckerTexture {
+    //     odd:  Box::new(SolidColor::new(0.9, 0.9, 0.9)),
+    //     even: Box::new(SolidColor::new(0.1, 0.6, 0.1))
+    // });
+    let texture_ground = CheckerTexture::new(
+        color(0.9, 0.9, 0.9),
+        color(0.1, 0.6, 0.1)
+    );
+    let material_ground = Lambertian::new(texture_ground);
+    world.add(Sphere::new(vec3(0.0, -1000.0, 0.0), 1000.0, material_ground));
+
+    for a in -GRID_SIZE..GRID_SIZE {
+        for b in -GRID_SIZE..GRID_SIZE {
+            let choose_mat: f64 = rng.gen::<f64>();
+            let center = Vec3 {
+                x: (a as f64) + 0.9 * rng.gen::<f64>(),
+                y: 0.2,
+                z: (b as f64) + 0.9 * rng.gen::<f64>()
+            };
+            let some_point = vec3(4.0, 0.2, 0.0);
+
+            if (center - some_point).length() > 0.9 {
+                if choose_mat < 0.8 {
+                    // diffuse
+                    let albedo = Color::random(0.0, 1.0, &mut rng) * Color::random(0.0, 1.0, &mut rng);
+                    let material = Lambertian::new(SolidColor::new(albedo.r, albedo.g, albedo.b));
+                    let center2 = center +  vec3(0.0, rng.gen_range(0.0, 0.25), 0.0);
+                    world.add(MovingSphere::new(center, center2, 0.0, 1.0, 0.2, material));
 
                 } else if choose_mat < 0.95 {
                     // metal

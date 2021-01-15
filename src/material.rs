@@ -18,7 +18,7 @@ pub trait Material: Clone {
 }
 
 #[enum_dispatch(Material)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub enum MaterialType {
     Lambertian,
     Metal,
@@ -32,7 +32,7 @@ impl Default for MaterialType {
 }
 
 // Lambertian
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct Lambertian {
     pub albedo: Texture
 }
@@ -57,7 +57,7 @@ impl Material for Lambertian {
 }
 
 // Metal
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct Metal {
     pub albedo: Texture,
     pub fuzz: f64
@@ -88,7 +88,7 @@ impl Material for Metal {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct Dielectric {
     pub ir: f64
 }
