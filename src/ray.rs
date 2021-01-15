@@ -1,11 +1,10 @@
 use crate::vec::Vec3;
 
-#[derive(Debug,Clone,Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct Ray {
     pub origin: Vec3,
     pub direction: Vec3,
-    pub time: f64
-
+    pub time: f64,
 }
 
 impl Ray {
@@ -14,4 +13,3 @@ impl Ray {
         self.origin + self.direction * _t
     }
 }
-

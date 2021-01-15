@@ -9,35 +9,26 @@ mod ray;
 mod scenes;
 mod sphere;
 mod texture;
-mod vec;
 mod util;
+mod vec;
 
 use std::io::{self};
-use std::sync::mpsc::{channel,RecvError};
+use std::sync::mpsc::{channel, RecvError};
 
 use rand::prelude::*;
 use rand::rngs::SmallRng;
 
 use bvh::BvhNode;
-use color::{Color, color, write_color};
-use hittable::{Hittable,Hittables};
+use color::{color, write_color, Color};
+use hittable::{Hittable, Hittables};
 use material::Material;
 use ray::Ray;
-use vec::{vec3};
+use vec::vec3;
 
 #[allow(unused_imports)]
 use crate::scenes::{
-    world1,
-    world2,
-    random_world_original,
-    random_world,
-    random_checkered_world,
-    random_world2,
-    camera2,
-    camera3,
-    camera_final,
-    camera_blur,
-    camera_other,
+    camera2, camera3, camera_blur, camera_final, camera_other, random_checkered_world,
+    random_world, random_world2, random_world_original, world1, world2,
 };
 
 extern crate threadpool;
@@ -57,27 +48,23 @@ const GRID_SIZE: i32 = 11;
 #[allow(dead_code)]
 fn ray_color(ray: Ray, world: &Hittables, depth: u32, rng: &mut SmallRng) -> Color {
     if depth <= 0 {
-        return color(0.0, 0.0, 0.0)
+        return color(0.0, 0.0, 0.0);
     }
     match world.hit(&ray, 0.0001, std::f64::INFINITY) {
-        Some(hit) => {
-            match hit.mat.scatter(&ray, &hit, rng) {
-                Some(scatter) => {
-                    return scatter.attenuation * ray_color(scatter.scattered, world, depth-1, rng);
-                }
-                None => {
-                    return color(0.0, 0.0, 0.0);
-                }
-
+        Some(hit) => match hit.mat.scatter(&ray, &hit, rng) {
+            Some(scatter) => {
+                return scatter.attenuation * ray_color(scatter.scattered, world, depth - 1, rng);
             }
-        }
+            None => {
+                return color(0.0, 0.0, 0.0);
+            }
+        },
         None => {
             let unit = ray.direction.unit_vector();
             let t = 0.5 * (unit.y + 1.0);
-            let c = (1.0 - t) * vec3(1.0, 1.0, 1.0)  + t * vec3(0.5, 0.7, 1.0);
+            let c = (1.0 - t) * vec3(1.0, 1.0, 1.0) + t * vec3(0.5, 0.7, 1.0);
             return color(c.x, c.y, c.z);
         }
-
     }
 }
 
@@ -105,24 +92,30 @@ fn main() -> Result<(), RecvError> {
     for h in 0..IMAGE_HEIGHT {
         let tx = tx.clone();
         let myworld = world.clone();
-        pool.execute(move || for w in 0..IMAGE_WIDTH {
-            let mut rng = SmallRng::from_entropy();
-            let mut pixel_color = Color{r: 0.0, g: 0.0, b: 0.0};
-            for _i in 0..SAMPLES_PER_PIXEL {
-                let ur: f64 = rng.gen();
-                let vr: f64 = rng.gen();
-                let u: f64 = ((w as f64) + ur) / ((IMAGE_WIDTH-1) as f64);
-                let v: f64 = ((h as f64) + vr) / ((IMAGE_HEIGHT-1) as f64);
-                let r = camera.get_ray(u, v, &mut rng);
-                pixel_color += ray_color(r, &myworld, MAX_DEPTH, &mut rng);
+        pool.execute(move || {
+            for w in 0..IMAGE_WIDTH {
+                let mut rng = SmallRng::from_entropy();
+                let mut pixel_color = Color {
+                    r: 0.0,
+                    g: 0.0,
+                    b: 0.0,
+                };
+                for _i in 0..SAMPLES_PER_PIXEL {
+                    let ur: f64 = rng.gen();
+                    let vr: f64 = rng.gen();
+                    let u: f64 = ((w as f64) + ur) / ((IMAGE_WIDTH - 1) as f64);
+                    let v: f64 = ((h as f64) + vr) / ((IMAGE_HEIGHT - 1) as f64);
+                    let r = camera.get_ray(u, v, &mut rng);
+                    pixel_color += ray_color(r, &myworld, MAX_DEPTH, &mut rng);
+                }
+                tx.send((w, h, pixel_color)).expect("Could not send data!");
             }
-            tx.send((w,h,pixel_color)).expect("Could not send data!");
         });
     }
 
     for _ in 0..(IMAGE_HEIGHT * IMAGE_WIDTH) {
         let (w, h, pixel) = rx.recv()?;
-        pixels[((IMAGE_HEIGHT-h-1)*IMAGE_WIDTH + w) as usize] = pixel;
+        pixels[((IMAGE_HEIGHT - h - 1) * IMAGE_WIDTH + w) as usize] = pixel;
     }
 
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);

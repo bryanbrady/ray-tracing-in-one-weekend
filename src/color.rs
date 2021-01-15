@@ -1,7 +1,7 @@
-use std::io::{self, Write};
-use std::ops;
 use rand::prelude::*;
 use rand::rngs::SmallRng;
+use std::io::{self, Write};
+use std::ops;
 
 use crate::util::clamp;
 
@@ -9,7 +9,7 @@ use crate::util::clamp;
 pub struct Color {
     pub r: f64,
     pub g: f64,
-    pub b: f64
+    pub b: f64,
 }
 
 impl Default for Color {
@@ -17,17 +17,13 @@ impl Default for Color {
         Color {
             r: 0.0,
             g: 0.0,
-            b: 0.0
+            b: 0.0,
         }
     }
 }
 
 pub fn color(x: f64, y: f64, z: f64) -> Color {
-    Color {
-        r: x,
-        g: y,
-        b: z
-    }
+    Color { r: x, g: y, b: z }
 }
 
 impl ops::AddAssign<Color> for Color {
@@ -35,7 +31,7 @@ impl ops::AddAssign<Color> for Color {
         *self = Self {
             r: self.r + _rhs.r,
             g: self.g + _rhs.g,
-            b: self.b + _rhs.b
+            b: self.b + _rhs.b,
         }
     }
 }
@@ -47,7 +43,7 @@ impl ops::Mul<f64> for Color {
         Color {
             r: self.r * _rhs,
             g: self.g * _rhs,
-            b: self.b * _rhs
+            b: self.b * _rhs,
         }
     }
 }
@@ -59,7 +55,7 @@ impl ops::Mul<Color> for f64 {
         Color {
             r: self * _rhs.r,
             g: self * _rhs.g,
-            b: self * _rhs.b
+            b: self * _rhs.b,
         }
     }
 }
@@ -71,7 +67,7 @@ impl ops::Mul<Color> for Color {
         Color {
             r: self.r * _rhs.r,
             g: self.g * _rhs.g,
-            b: self.b * _rhs.b
+            b: self.b * _rhs.b,
         }
     }
 }
@@ -79,12 +75,11 @@ impl ops::Mul<Color> for Color {
 impl Color {
     pub fn random(min: f64, max: f64, rng: &mut SmallRng) -> Color {
         Color {
-            r: rng.gen_range(min,max),
-            g: rng.gen_range(min,max),
-            b: rng.gen_range(min,max)
+            r: rng.gen_range(min, max),
+            g: rng.gen_range(min, max),
+            b: rng.gen_range(min, max),
         }
     }
-
 }
 
 pub fn write_color(_out: &mut impl Write, color: Color, samples_per_pixel: u64) -> io::Result<()> {

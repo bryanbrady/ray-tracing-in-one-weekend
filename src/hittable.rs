@@ -1,11 +1,11 @@
-use enum_dispatch::enum_dispatch;
 use crate::aabb::Aabb;
 use crate::bvh::BvhNode;
 use crate::hittable_list::HittableList;
 use crate::material::MaterialType;
 use crate::ray::Ray;
-use crate::sphere::{Sphere, MovingSphere};
-use crate::vec::{Vec3};
+use crate::sphere::{MovingSphere, Sphere};
+use crate::vec::Vec3;
+use enum_dispatch::enum_dispatch;
 
 pub struct HitRecord {
     pub point: Vec3,
@@ -14,7 +14,7 @@ pub struct HitRecord {
     pub u: f64,
     pub v: f64,
     pub front_face: bool,
-    pub mat: MaterialType
+    pub mat: MaterialType,
 }
 
 #[enum_dispatch]
@@ -30,5 +30,5 @@ pub enum Hittables {
     BvhNode,
     MovingSphere,
     Sphere,
-    HittableList
+    HittableList,
 }
