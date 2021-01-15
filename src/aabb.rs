@@ -69,6 +69,8 @@ impl Hittable for Aabb {
         // Return dummy HitRecord
         return Some(HitRecord {
             t: 0.0,
+            u: 0.0,
+            v: 0.0,
             point: Vec3::default(),
             normal: Vec3::default(),
             front_face: false,

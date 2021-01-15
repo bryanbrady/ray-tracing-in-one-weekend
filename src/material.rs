@@ -1,6 +1,7 @@
 use crate::color::{Color, color};
 use crate::hittable::HitRecord;
 use crate::ray::Ray;
+use crate::texture::{Texture,TextureColor};
 use crate::vec::Vec3;
 use enum_dispatch::enum_dispatch;
 use rand::prelude::*;
@@ -26,19 +27,19 @@ pub enum MaterialType {
 
 impl Default for MaterialType {
     fn default() -> MaterialType {
-        Lambertian::new(Color::default())
+        Lambertian::new(Texture::default())
     }
 }
 
 // Lambertian
 #[derive(Debug, Clone, Copy)]
 pub struct Lambertian {
-    pub albedo: Color
+    pub albedo: Texture
 }
 
 impl Lambertian {
-    pub fn new(albedo: Color) -> MaterialType {
-        MaterialType::from( Lambertian { albedo })
+    pub fn new(albedo: Texture) -> MaterialType {
+        MaterialType::from( Lambertian { albedo: albedo })
     }
 }
 
@@ -47,7 +48,7 @@ impl Material for Lambertian {
         let scatter_direction = hit.normal + Vec3::random_unit_vector(rng);
         let scatter_direction = if scatter_direction.near_zero() { hit.normal } else { scatter_direction };
         let scattered = Ray { origin: hit.point, direction: scatter_direction, time: ray.time };
-        let attenuation = self.albedo;
+        let attenuation = self.albedo.value(hit.u, hit.v, hit.point);
         Some(Scatter {
             scattered: scattered,
             attenuation: attenuation
@@ -58,12 +59,12 @@ impl Material for Lambertian {
 // Metal
 #[derive(Debug, Clone, Copy)]
 pub struct Metal {
-    pub albedo: Color,
+    pub albedo: Texture,
     pub fuzz: f64
 }
 
 impl Metal {
-    pub fn new(albedo: Color, fuzz: f64) -> MaterialType {
+    pub fn new(albedo: Texture, fuzz: f64) -> MaterialType {
         MaterialType::from( Metal {
             albedo: albedo,
             fuzz: if fuzz < 1.0 { fuzz } else { 1.0 }
@@ -79,7 +80,7 @@ impl Material for Metal {
             direction: reflected + self.fuzz * Vec3::random_in_unit_sphere(rng),
             time: ray.time
         };
-        let attenuation = self.albedo;
+        let attenuation = self.albedo.value(hit.u, hit.v, hit.point);
         if scattered.direction.dot(hit.normal) > 0.0 {
             return Some(Scatter {scattered: scattered, attenuation: attenuation})
         }

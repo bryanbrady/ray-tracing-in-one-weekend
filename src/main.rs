@@ -8,6 +8,7 @@ mod material;
 mod ray;
 mod scenes;
 mod sphere;
+mod texture;
 mod vec;
 mod util;
 

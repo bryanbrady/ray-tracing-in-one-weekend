@@ -40,9 +40,12 @@ impl Hittable for Sphere {
                 let outward_normal = (point - self.center) / self.radius;
                 let front_face = ray.direction.dot(outward_normal) < 0.0;
                 let normal = if front_face { outward_normal } else { -outward_normal };
+                let (u,v) = get_sphere_uv(&point);
 
                 return Some(HitRecord {
                     t: t,
+                    u: u,
+                    v: v,
                     point: point,
                     normal: normal,
                     front_face: front_face,
@@ -58,9 +61,12 @@ impl Hittable for Sphere {
                 let outward_normal = (point - self.center) / self.radius;
                 let front_face = ray.direction.dot(outward_normal) < 0.0;
                 let normal = if front_face { outward_normal } else { -outward_normal };
+                let (u,v) = get_sphere_uv(&point);
 
                 return Some(HitRecord {
                     t: t,
+                    u: u,
+                    v: v,
                     point: point,
                     normal: normal,
                     front_face: front_face,
@@ -126,9 +132,12 @@ impl Hittable for MovingSphere {
                 let outward_normal = (point - self.center(ray.time)) / self.radius;
                 let front_face = ray.direction.dot(outward_normal) < 0.0;
                 let normal = if front_face { outward_normal } else { -outward_normal };
+                let (u,v) = get_sphere_uv(&point);
 
                 return Some(HitRecord {
                     t: t,
+                    u: u,
+                    v: v,
                     point: point,
                     normal: normal,
                     front_face: front_face,
@@ -144,9 +153,12 @@ impl Hittable for MovingSphere {
                 let outward_normal = (point - self.center(ray.time)) / self.radius;
                 let front_face = ray.direction.dot(outward_normal) < 0.0;
                 let normal = if front_face { outward_normal } else { -outward_normal };
+                let (u,v) = get_sphere_uv(&point);
 
                 return Some(HitRecord {
                     t: t,
+                    u: u,
+                    v: v,
                     point: point,
                     normal: normal,
                     front_face: front_face,
@@ -169,3 +181,12 @@ impl Hittable for MovingSphere {
         Some(Aabb::surrounding_box(box0, box1))
     }
 }
+
+pub fn get_sphere_uv(p: &Vec3) -> (f64, f64) {
+    let theta = f64::acos(-p.y);
+    let phi = f64::atan2(-p.z, p.x + std::f64::consts::PI);
+    let u = phi / (2.0*std::f64::consts::PI);
+    let v = theta / std::f64::consts::PI;
+    (u,v)
+}
+
