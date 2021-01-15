@@ -23,7 +23,7 @@ use color::{Color, color, write_color};
 use hittable::{Hittable,Hittables};
 use material::Material;
 use ray::Ray;
-use vec::Vec3;
+use vec::{vec3};
 
 #[allow(unused_imports)]
 use crate::scenes::{
@@ -73,7 +73,7 @@ fn ray_color(ray: Ray, world: &Hittables, depth: u32, rng: &mut SmallRng) -> Col
         None => {
             let unit = ray.direction.unit_vector();
             let t = 0.5 * (unit.y + 1.0);
-            let c = (1.0 - t) * Vec3::new(1.0, 1.0, 1.0)  + t * Vec3::new(0.5, 0.7, 1.0);
+            let c = (1.0 - t) * vec3(1.0, 1.0, 1.0)  + t * vec3(0.5, 0.7, 1.0);
             return color(c.x, c.y, c.z);
         }
 

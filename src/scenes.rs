@@ -10,7 +10,7 @@ use crate::hittable_list::HittableList;
 use crate::material::{Metal, Lambertian, Dielectric};
 use crate::sphere::{Sphere,MovingSphere};
 use crate::texture::{SolidColor};
-use crate::vec::Vec3;
+use crate::vec::{Vec3,vec3};
 
 
 #[derive(Debug)]
@@ -60,7 +60,7 @@ pub fn random_world_original() -> HittableList {
     let mut rng = SmallRng::from_entropy();
     let mut world = HittableList{ hittables: Vec::new()};
     let material_ground = Lambertian::new(SolidColor::new(0.5, 0.5, 0.5));
-    world.add(Sphere::new(Vec3::new(0.0, -1000.0, 0.0), 1000.0, material_ground));
+    world.add(Sphere::new(vec3(0.0, -1000.0, 0.0), 1000.0, material_ground));
 
     for a in -GRID_SIZE..GRID_SIZE {
         for b in -GRID_SIZE..GRID_SIZE {
@@ -70,7 +70,7 @@ pub fn random_world_original() -> HittableList {
                 y: 0.2,
                 z: (b as f64) + 0.9 * rng.gen::<f64>()
             };
-            let some_point = Vec3::new(4.0, 0.2, 0.0);
+            let some_point = vec3(4.0, 0.2, 0.0);
 
             if (center - some_point).length() > 0.9 {
                 if choose_mat < 0.8 {
@@ -95,9 +95,9 @@ pub fn random_world_original() -> HittableList {
         }
     }
 
-    world.add(Sphere::new(Vec3::new(0.0, 1.0, 0.0),  1.0, Dielectric::new(1.5)));
-    world.add(Sphere::new(Vec3::new(-4.0, 1.0, 0.0), 1.0, Lambertian::new(SolidColor::new(0.4, 0.2, 0.1))));
-    world.add(Sphere::new(Vec3::new(4.0, 1.0, 0.0),  1.0, Metal::new(SolidColor::new(0.7, 0.6, 0.5), 0.0)));
+    world.add(Sphere::new(vec3(0.0, 1.0, 0.0),  1.0, Dielectric::new(1.5)));
+    world.add(Sphere::new(vec3(-4.0, 1.0, 0.0), 1.0, Lambertian::new(SolidColor::new(0.4, 0.2, 0.1))));
+    world.add(Sphere::new(vec3(4.0, 1.0, 0.0),  1.0, Metal::new(SolidColor::new(0.7, 0.6, 0.5), 0.0)));
     return world
 }
 
@@ -106,7 +106,7 @@ pub fn random_world() -> HittableList {
     let mut rng = SmallRng::from_entropy();
     let mut world = HittableList{ hittables: Vec::new()};
     let material_ground = Lambertian::new(SolidColor::new(0.5, 0.5, 0.5));
-    world.add(Sphere::new(Vec3::new(0.0, -1000.0, 0.0), 1000.0, material_ground));
+    world.add(Sphere::new(vec3(0.0, -1000.0, 0.0), 1000.0, material_ground));
 
     for a in -GRID_SIZE..GRID_SIZE {
         for b in -GRID_SIZE..GRID_SIZE {
@@ -116,14 +116,14 @@ pub fn random_world() -> HittableList {
                 y: 0.2,
                 z: (b as f64) + 0.9 * rng.gen::<f64>()
             };
-            let some_point = Vec3::new(4.0, 0.2, 0.0);
+            let some_point = vec3(4.0, 0.2, 0.0);
 
             if (center - some_point).length() > 0.9 {
                 if choose_mat < 0.8 {
                     // diffuse
                     let albedo = Color::random(0.0, 1.0, &mut rng) * Color::random(0.0, 1.0, &mut rng);
                     let material = Lambertian::new(SolidColor::new(albedo.r, albedo.g, albedo.b));
-                    let center2 = center +  Vec3::new(0.0, rng.gen_range(0.0, 0.25), 0.0);
+                    let center2 = center +  vec3(0.0, rng.gen_range(0.0, 0.25), 0.0);
                     world.add(MovingSphere::new(center, center2, 0.0, 1.0, 0.2, material));
 
                 } else if choose_mat < 0.95 {
@@ -142,9 +142,9 @@ pub fn random_world() -> HittableList {
         }
     }
 
-    world.add(Sphere::new(Vec3::new(0.0, 1.0, 0.0),  1.0, Dielectric::new(1.5)));
-    world.add(Sphere::new(Vec3::new(-4.0, 1.0, 0.0), 1.0, Lambertian::new(SolidColor::new(0.4, 0.2, 0.1))));
-    world.add(Sphere::new(Vec3::new(4.0, 1.0, 0.0),  1.0, Metal::new(SolidColor::new(0.7, 0.6, 0.5), 0.0)));
+    world.add(Sphere::new(vec3(0.0, 1.0, 0.0),  1.0, Dielectric::new(1.5)));
+    world.add(Sphere::new(vec3(-4.0, 1.0, 0.0), 1.0, Lambertian::new(SolidColor::new(0.4, 0.2, 0.1))));
+    world.add(Sphere::new(vec3(4.0, 1.0, 0.0),  1.0, Metal::new(SolidColor::new(0.7, 0.6, 0.5), 0.0)));
     return world
 }
 
@@ -154,7 +154,7 @@ pub fn random_world2() -> HittableList {
     let mut world = HittableList{ hittables: Vec::new()};
 
     let material_ground = Lambertian::new(SolidColor::new(0.0, 0.0, 0.0));
-    world.add(Sphere::new(Vec3::new(0.0, -1100.0, 0.0), 1000.0, material_ground));
+    world.add(Sphere::new(vec3(0.0, -1100.0, 0.0), 1000.0, material_ground));
 
     for a in -GRID_SIZE..GRID_SIZE {
         for b in -GRID_SIZE..GRID_SIZE {
@@ -165,7 +165,7 @@ pub fn random_world2() -> HittableList {
                     y: (b as f64) + 1.5 * rng.gen::<f64>(),
                     z: (c as f64) + 1.5 * rng.gen::<f64>()
                 };
-                let some_point = Vec3::new(4.0, 0.2, 0.0);
+                let some_point = vec3(4.0, 0.2, 0.0);
 
                 if (center - some_point).length() > 0.9 {
                     if choose_mat < 0.2 {
@@ -197,9 +197,9 @@ pub fn random_world2() -> HittableList {
 #[allow(dead_code)]
 pub fn camera2(t0: f64, t1: f64) -> Camera {
     let vfov: f64 = 20.0;
-    let lookfrom = Vec3::new(3.0, 3.0, 2.0);
-    let lookat= Vec3::new(0.0, 0.0, -1.0);
-    let vup = Vec3::new(0.0, 1.0, 0.0);
+    let lookfrom = vec3(3.0, 3.0, 2.0);
+    let lookat= vec3(0.0, 0.0, -1.0);
+    let vup = vec3(0.0, 1.0, 0.0);
     let aperture = 2.0;
     let dist_to_focus = (lookfrom-lookat).length();
     return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus, t0, t1);
@@ -208,9 +208,9 @@ pub fn camera2(t0: f64, t1: f64) -> Camera {
 #[allow(dead_code)]
 pub fn camera3(t0: f64, t1: f64) -> Camera {
     let vfov: f64 = 20.0;
-    let lookfrom = Vec3::new(13.0, 2.0, 3.0);
-    let lookat= Vec3::new(0.0, 0.0, 0.0);
-    let vup = Vec3::new(0.0, 1.0, 0.0);
+    let lookfrom = vec3(13.0, 2.0, 3.0);
+    let lookat= vec3(0.0, 0.0, 0.0);
+    let vup = vec3(0.0, 1.0, 0.0);
     let aperture = 0.1;
     let dist_to_focus = 10.0;
     return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus, t0, t1);
@@ -219,9 +219,9 @@ pub fn camera3(t0: f64, t1: f64) -> Camera {
 #[allow(dead_code)]
 pub fn camera_final(t0: f64, t1: f64) -> Camera {
     let vfov: f64 = 20.0;
-    let lookfrom = Vec3::new(13.0, 2.0, 3.0);
-    let lookat= Vec3::new(0.0, 0.0, 0.0);
-    let vup = Vec3::new(0.0, 1.0, 0.0);
+    let lookfrom = vec3(13.0, 2.0, 3.0);
+    let lookat= vec3(0.0, 0.0, 0.0);
+    let vup = vec3(0.0, 1.0, 0.0);
     let aperture = 0.1;
     let dist_to_focus = 12.0;
     return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus, t0, t1);
@@ -230,9 +230,9 @@ pub fn camera_final(t0: f64, t1: f64) -> Camera {
 #[allow(dead_code)]
 pub fn camera_blur(t0: f64, t1: f64) -> Camera {
     let vfov: f64 = 20.0;
-    let lookfrom = Vec3::new(13.0, 2.0, 3.0);
-    let lookat= Vec3::new(0.0, 0.0, 0.0);
-    let vup = Vec3::new(0.0, 1.0, 0.0);
+    let lookfrom = vec3(13.0, 2.0, 3.0);
+    let lookat= vec3(0.0, 0.0, 0.0);
+    let vup = vec3(0.0, 1.0, 0.0);
     let aperture = 0.1;
     let dist_to_focus = 10.0;
     return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus, t0, t1);
@@ -241,9 +241,9 @@ pub fn camera_blur(t0: f64, t1: f64) -> Camera {
 #[allow(dead_code)]
 pub fn camera_other(t0: f64, t1: f64) -> Camera {
     let vfov: f64 = 20.0;
-    let lookfrom = Vec3::new(1.0, 20.0, 1.0);
-    let lookat= Vec3::new(0.0, 0.0, 0.0);
-    let vup = Vec3::new(0.0, 1.0, 0.0);
+    let lookfrom = vec3(1.0, 20.0, 1.0);
+    let lookat= vec3(0.0, 0.0, 0.0);
+    let vup = vec3(0.0, 1.0, 0.0);
     let aperture = 0.1;
     let dist_to_focus = 18.0;
     return Camera::new(lookfrom, lookat, vup, vfov, ASPECT_RATIO, aperture, dist_to_focus, t0, t1);

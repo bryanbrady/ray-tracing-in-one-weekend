@@ -116,7 +116,14 @@ impl Vec3 {
             return -r;
         }
     }
+}
 
+pub fn vec3(x: f64, y: f64, z: f64) -> Vec3 {
+    Vec3 {
+        x: x,
+        y: y,
+        z: z
+    }
 }
 
 impl ops::Add<Vec3> for Vec3 {
