@@ -1,4 +1,5 @@
 use crate::color::{color, Color};
+use crate::perlin::Perlin;
 use crate::vec::Vec3;
 use enum_dispatch::enum_dispatch;
 
@@ -12,6 +13,7 @@ pub trait TextureColor {
 pub enum Texture {
     SolidColor,
     CheckerTexture,
+    NoiseTexture,
 }
 
 impl Default for Texture {
@@ -81,5 +83,25 @@ impl TextureColor for CheckerTexture {
         } else {
             self.even.value(u, v, p)
         }
+    }
+}
+
+// NoiseTexture
+#[derive(Debug, Clone)]
+pub struct NoiseTexture {
+    pub noise: Perlin,
+}
+
+impl NoiseTexture {
+    pub fn new(seed: u64) -> Texture {
+        Texture::from(NoiseTexture {
+            noise: Perlin::new(seed)
+        })
+    }
+}
+
+impl TextureColor for NoiseTexture {
+    fn value(&self, _u: f64, _v: f64, p: Vec3) -> Color {
+        color(1.0, 1.0, 1.0) * self.noise.noise(p)
     }
 }

@@ -5,6 +5,7 @@ mod color;
 mod hittable;
 mod hittable_list;
 mod material;
+mod perlin;
 mod ray;
 mod scenes;
 mod sphere;
@@ -28,7 +29,7 @@ use vec::vec3;
 #[allow(unused_imports)]
 use crate::scenes::{
     camera2, camera3, camera_blur, camera_final, camera_other, random_checkered_world,
-    random_world, random_world2, random_world_original, world1, world2,
+    random_world, random_world2, random_world_original, world1, world2, perlin1
 };
 
 extern crate threadpool;
@@ -78,7 +79,9 @@ fn main() -> Result<(), RecvError> {
     let (time0, time1) = (0.0, 0.0);
 
     // World
-    let world = Hittables::from(BvhNode::new(random_checkered_world(), time0, time1));
+    //let world = Hittables::from(BvhNode::new(random_checkered_world(), time0, time1));
+    //let world = Hittables::from(BvhNode::new(perlin1(), time0, time1));
+    let world = Hittables::from(BvhNode::new(perlin1(), time0, time1));
 
     // Camera
     let camera = camera_final(time0, time1);

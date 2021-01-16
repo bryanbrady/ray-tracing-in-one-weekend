@@ -7,7 +7,7 @@ use crate::hittable::Hittables;
 use crate::hittable_list::HittableList;
 use crate::material::{Dielectric, Lambertian, Metal};
 use crate::sphere::{MovingSphere, Sphere};
-use crate::texture::{CheckerTexture, SolidColor};
+use crate::texture::{CheckerTexture, NoiseTexture, SolidColor};
 use crate::vec::{vec3, Vec3};
 use crate::{ASPECT_RATIO, GRID_SIZE};
 
@@ -19,7 +19,7 @@ pub struct Scene {
 
 #[allow(dead_code)]
 pub fn world1() -> HittableList {
-    // World 1
+    // World 1 - 5 spheres
     let material_ground = Lambertian::new(SolidColor::new(0.8, 0.8, 0.0));
     let material_center = Lambertian::new(SolidColor::new(0.1, 0.2, 0.5));
     let material_left = Dielectric::new(1.5);
@@ -27,7 +27,7 @@ pub fn world1() -> HittableList {
     let sphere1 = Sphere::new(vec3(0.0, -100.5, -1.0), 100.0, material_ground.clone());
     let sphere2 = Sphere::new(vec3(0.0, 0.0, -1.0), 0.5, material_center.clone());
     let sphere3 = Sphere::new(vec3(-1.0, 0.0, -1.0), 0.5, material_left.clone());
-    let sphere4 = Sphere::new(vec3(-1.0, 0.0, -1.0), -0.45, material_left.clone());
+    let sphere4 = Sphere::new(vec3(-1.0, 0.0, -1.0), 1.5, material_left.clone());
     let sphere5 = Sphere::new(vec3(1.0, 0.0, -1.0), 0.5, material_right.clone());
     let mut world = HittableList {
         hittables: Vec::new(),
@@ -42,12 +42,26 @@ pub fn world1() -> HittableList {
 
 #[allow(dead_code)]
 pub fn world2() -> HittableList {
-    // World 2
+    // World 2 - 2 Spheres
     let r = f64::cos(std::f64::consts::PI / 4.0);
     let material_left = Lambertian::new(SolidColor::new(0.0, 0.0, 1.0));
     let material_right = Lambertian::new(SolidColor::new(1.0, 0.0, 0.0));
     let sphere1 = Sphere::new(vec3(-r, 0.0, -1.0), r, material_left.clone());
     let sphere2 = Sphere::new(vec3(r, 0.0, -1.0), r, material_right.clone());
+    let mut world = HittableList {
+        hittables: Vec::new(),
+    };
+    world.add(sphere1);
+    world.add(sphere2);
+    return world;
+}
+
+#[allow(dead_code)]
+pub fn perlin1() -> HittableList {
+    let r = f64::cos(std::f64::consts::PI / 4.0);
+    let perlin = Lambertian::new(NoiseTexture::new(0));
+    let sphere1 = Sphere::new(vec3(-r, 0.0, -1.0), r, perlin.clone());
+    let sphere2 = Sphere::new(vec3(r, 0.0, -1.0), r, perlin.clone());
     let mut world = HittableList {
         hittables: Vec::new(),
     };
@@ -121,10 +135,6 @@ pub fn random_checkered_world() -> HittableList {
     let mut world = HittableList {
         hittables: Vec::new(),
     };
-    // let texture_ground = Texture::from(CheckerTexture {
-    //     odd:  Box::new(SolidColor::new(0.9, 0.9, 0.9)),
-    //     even: Box::new(SolidColor::new(0.1, 0.6, 0.1))
-    // });
     let texture_ground = CheckerTexture::new(color(0.9, 0.9, 0.9), color(0.1, 0.6, 0.1));
     let material_ground = Lambertian::new(texture_ground);
     world.add(Sphere::new(
