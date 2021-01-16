@@ -237,6 +237,16 @@ impl ops::Neg for Vec3 {
     }
 }
 
+impl ops::MulAssign<f64> for Vec3 {
+    fn mul_assign(&mut self, _rhs: f64) {
+        *self = Self {
+            x: self.x * _rhs,
+            y: self.y * _rhs,
+            z: self.z * _rhs,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

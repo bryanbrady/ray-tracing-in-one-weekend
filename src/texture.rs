@@ -1,4 +1,5 @@
 use crate::color::{color, Color};
+use crate::perlin::Perlin;
 use crate::vec::Vec3;
 use enum_dispatch::enum_dispatch;
 
@@ -12,6 +13,9 @@ pub trait TextureColor {
 pub enum Texture {
     SolidColor,
     CheckerTexture,
+    NoiseTexture,
+    TurbulenceTexture,
+    MarbleTexture,
 }
 
 impl Default for Texture {
@@ -81,5 +85,73 @@ impl TextureColor for CheckerTexture {
         } else {
             self.even.value(u, v, p)
         }
+    }
+}
+
+// NoiseTexture
+#[derive(Debug, Clone)]
+pub struct NoiseTexture {
+    pub noise: Perlin,
+    pub scale: f64,
+}
+
+impl NoiseTexture {
+    pub fn new(seed: u64, scale: f64) -> Texture {
+        Texture::from(NoiseTexture {
+            noise: Perlin::new(seed),
+            scale: scale,
+        })
+    }
+}
+
+impl TextureColor for NoiseTexture {
+    fn value(&self, _u: f64, _v: f64, p: Vec3) -> Color {
+        color(1.0, 1.0, 1.0) * 0.5 * (1.0 + self.noise.noise(p * self.scale))
+    }
+}
+
+// TurbulenceTexture
+#[derive(Debug, Clone)]
+pub struct TurbulenceTexture {
+    pub noise: Perlin,
+    pub scale: f64,
+}
+
+impl TurbulenceTexture {
+    pub fn new(seed: u64, scale: f64) -> Texture {
+        Texture::from(TurbulenceTexture {
+            noise: Perlin::new(seed),
+            scale: scale,
+        })
+    }
+}
+
+impl TextureColor for TurbulenceTexture {
+    fn value(&self, _u: f64, _v: f64, p: Vec3) -> Color {
+        color(1.0, 1.0, 1.0) * self.noise.turb(p * self.scale, 7)
+    }
+}
+
+// MarbleTexture
+#[derive(Debug, Clone)]
+pub struct MarbleTexture {
+    pub noise: Perlin,
+    pub scale: f64,
+}
+
+impl MarbleTexture {
+    pub fn new(seed: u64, scale: f64) -> Texture {
+        Texture::from(MarbleTexture {
+            noise: Perlin::new(seed),
+            scale: scale,
+        })
+    }
+}
+
+impl TextureColor for MarbleTexture {
+    fn value(&self, _u: f64, _v: f64, p: Vec3) -> Color {
+        color(1.0, 1.0, 1.0)
+            * 0.5
+            * (1.0 + f64::sin(self.scale * p.x * p.y + 10. * self.noise.turb(p * self.scale, 7)))
     }
 }
