@@ -1,5 +1,4 @@
-use crate::aabb::Aabb;
-use crate::hittable::{HitRecord, Hittable, Hittables};
+use crate::hittable::{aabb::Aabb, HitRecord, Hittable, Hittables};
 use crate::material::MaterialType;
 use crate::ray::Ray;
 use crate::vec::{vec3, Vec3};

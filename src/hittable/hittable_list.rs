@@ -1,5 +1,4 @@
-use crate::aabb::Aabb;
-use crate::hittable::{HitRecord, Hittable, Hittables};
+use crate::hittable::{aabb::Aabb, HitRecord, Hittable, Hittables};
 use crate::ray::Ray;
 
 #[derive(Debug, Clone)]

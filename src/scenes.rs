@@ -1,9 +1,11 @@
 use crate::camera::Camera;
 use crate::color::{color, Color};
-use crate::hittable::Hittables;
-use crate::hittable_list::HittableList;
+use crate::hittable::{
+    hittable_list::HittableList,
+    sphere::{MovingSphere, Sphere},
+    Hittables,
+};
 use crate::material::{dielectric::Dielectric, lambertian::Lambertian, metal::Metal};
-use crate::sphere::{MovingSphere, Sphere};
 use crate::texture::{
     checker::CheckerTexture, marble::MarbleTexture, noise::NoiseTexture, solidcolor::SolidColor,
     turbulence::TurbulenceTexture,

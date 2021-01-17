@@ -1,13 +1,9 @@
-mod aabb;
-mod bvh;
 mod camera;
 mod color;
 mod hittable;
-mod hittable_list;
 mod material;
 mod ray;
 mod scenes;
-mod sphere;
 mod texture;
 mod util;
 mod vec;
@@ -18,9 +14,8 @@ use std::sync::mpsc::{channel, RecvError};
 use rand::prelude::*;
 use rand::rngs::SmallRng;
 
-use bvh::BvhNode;
 use color::{color, write_color, Color};
-use hittable::{Hittable, Hittables};
+use hittable::{bvh::BvhNode, Hittable, Hittables};
 use material::Material;
 use ray::Ray;
 use vec::vec3;

@@ -1,6 +1,4 @@
-use crate::aabb::Aabb;
-use crate::hittable::{HitRecord, Hittable, Hittables};
-use crate::hittable_list::HittableList;
+use crate::hittable::{aabb::Aabb, hittable_list::HittableList, HitRecord, Hittable, Hittables};
 use crate::ray::Ray;
 use rand::prelude::*;
 use rand::rngs::SmallRng;

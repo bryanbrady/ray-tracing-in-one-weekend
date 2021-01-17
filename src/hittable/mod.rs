@@ -1,11 +1,18 @@
-use crate::aabb::Aabb;
-use crate::bvh::BvhNode;
-use crate::hittable_list::HittableList;
+use crate::hittable::{
+    aabb::Aabb,
+    bvh::BvhNode,
+    hittable_list::HittableList,
+    sphere::{MovingSphere, Sphere},
+};
 use crate::material::MaterialType;
 use crate::ray::Ray;
-use crate::sphere::{MovingSphere, Sphere};
 use crate::vec::Vec3;
 use enum_dispatch::enum_dispatch;
+
+pub mod aabb;
+pub mod bvh;
+pub mod hittable_list;
+pub mod sphere;
 
 pub struct HitRecord {
     pub point: Vec3,
