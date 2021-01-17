@@ -1,15 +1,14 @@
-use rand::prelude::*;
-use rand::rngs::SmallRng;
-
 use crate::camera::Camera;
 use crate::color::{color, Color};
 use crate::hittable::Hittables;
 use crate::hittable_list::HittableList;
-use crate::material::{Dielectric, Lambertian, Metal};
+use crate::material::{dielectric::Dielectric, lambertian::Lambertian, metal::Metal};
 use crate::sphere::{MovingSphere, Sphere};
 use crate::texture::{CheckerTexture, MarbleTexture, NoiseTexture, SolidColor, TurbulenceTexture};
 use crate::vec::{vec3, Vec3};
 use crate::{ASPECT_RATIO, GRID_SIZE};
+use rand::prelude::*;
+use rand::rngs::SmallRng;
 
 #[derive(Debug)]
 pub struct Scene {
