@@ -4,7 +4,10 @@ use crate::hittable::Hittables;
 use crate::hittable_list::HittableList;
 use crate::material::{dielectric::Dielectric, lambertian::Lambertian, metal::Metal};
 use crate::sphere::{MovingSphere, Sphere};
-use crate::texture::{CheckerTexture, MarbleTexture, NoiseTexture, SolidColor, TurbulenceTexture};
+use crate::texture::{
+    checker::CheckerTexture, marble::MarbleTexture, noise::NoiseTexture, solidcolor::SolidColor,
+    turbulence::TurbulenceTexture,
+};
 use crate::vec::{vec3, Vec3};
 use crate::{ASPECT_RATIO, GRID_SIZE};
 use rand::prelude::*;

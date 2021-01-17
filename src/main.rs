@@ -5,7 +5,6 @@ mod color;
 mod hittable;
 mod hittable_list;
 mod material;
-mod perlin;
 mod ray;
 mod scenes;
 mod sphere;
