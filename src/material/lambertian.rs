@@ -4,6 +4,7 @@ use crate::ray::Ray;
 use crate::texture::{Texture, TextureColor};
 use crate::vec::Vec3;
 use rand::rngs::SmallRng;
+use std::sync::Arc;
 
 // Lambertian
 #[derive(Debug, Clone)]
@@ -12,9 +13,9 @@ pub struct Lambertian {
 }
 
 impl Lambertian {
-    pub fn new(albedo: Texture) -> MaterialType {
+    pub fn new(albedo: Texture) -> Arc<MaterialType> {
         //eprintln!("Lambertian::new(albedo: {:?}", albedo);
-        MaterialType::from(Lambertian { albedo: albedo })
+        Arc::new(MaterialType::from(Lambertian { albedo: albedo }))
     }
 }
 

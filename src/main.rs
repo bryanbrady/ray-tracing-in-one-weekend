@@ -22,9 +22,9 @@ use vec::vec3;
 
 #[allow(unused_imports)]
 use crate::scenes::{
-    camera2, camera3, camera_blur, camera_final, camera_other, marble1, noise1,
-    random_checkered_world, random_world, random_world2, random_world_original, random_world_earth, turbulence1,
-    world1, world2, earth
+    camera2, camera3, camera_blur, camera_final, camera_other, earth, marble1, noise1,
+    random_checkered_world, random_world, random_world2, random_world_earth, random_world_original,
+    turbulence1, world1, world2,
 };
 
 extern crate threadpool;
@@ -65,7 +65,7 @@ fn ray_color(ray: Ray, world: &Hittables, depth: u32, rng: &mut SmallRng) -> Col
 }
 
 fn main() -> Result<(), RecvError> {
-    //PROFILER.lock().unwrap().start("./rt.profile").expect("Couldn't start");
+    // PROFILER.lock().unwrap().start("./rt.profile").expect("Couldn't start");
 
     // Pixels
     let mut pixels = vec![color(0.0, 0.0, 0.0); PIXELS as usize];
@@ -74,13 +74,7 @@ fn main() -> Result<(), RecvError> {
     let (time0, time1) = (0.0, 0.0);
 
     // World
-    //let world = Hittables::from(BvhNode::new(random_checkered_world(), time0, time1));
-    //let world = Hittables::from(BvhNode::new(noise1(), time0, time1));
-    //let world = Hittables::from(BvhNode::new(turbulence1(), time0, time1));
-    //let world = Hittables::from(BvhNode::new(marble1(), time0, time1));
-    //let world = Hittables::from(BvhNode::new(earth(), time0, time1));
-    //let world = Hittables::from(BvhNode::new(random_world(), time0, time1));
-    let world = Hittables::from(BvhNode::new(random_world_original(), time0, time1));
+    let world = Hittables::from(BvhNode::new(random_world_earth(), time0, time1));
 
     // Camera
     let camera = camera_final(time0, time1);
@@ -126,6 +120,6 @@ fn main() -> Result<(), RecvError> {
     }
 
     eprintln!("Done!\n");
-    //PROFILER.lock().unwrap().stop().expect("Couldn't stop");
+    // PROFILER.lock().unwrap().stop().expect("Couldn't stop");
     Ok(())
 }

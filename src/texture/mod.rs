@@ -1,7 +1,7 @@
 use crate::color::Color;
 use crate::texture::{
-    checker::CheckerTexture, marble::MarbleTexture, noise::NoiseTexture, solidcolor::SolidColor,
-    turbulence::TurbulenceTexture, image::ImageTexture
+    checker::CheckerTexture, image::ImageTexture, marble::MarbleTexture, noise::NoiseTexture,
+    solidcolor::SolidColor, turbulence::TurbulenceTexture,
 };
 use crate::vec::Vec3;
 use enum_dispatch::enum_dispatch;

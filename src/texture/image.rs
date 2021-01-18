@@ -1,9 +1,9 @@
-use std::sync::Arc;
-use image::io::Reader as ImageReader;
 use crate::color::{color, Color};
 use crate::texture::{Texture, TextureColor};
-use crate::vec::Vec3;
 use crate::util::clamp;
+use crate::vec::Vec3;
+use image::io::Reader as ImageReader;
+use std::sync::Arc;
 
 // Image
 #[derive(Debug, Clone)]
@@ -30,14 +30,14 @@ impl ImageTexture {
             Err(error) => {
                 eprintln!("Problem opening image: {:?}", error);
                 return default;
-            },
+            }
         };
         let img = match img.decode() {
             Ok(img) => img,
             Err(error) => {
                 eprintln!("Problem decoding image: {:?}", error);
                 return default;
-            },
+            }
         };
         let rgb8 = img.to_rgb8();
         let bytes: Vec<u8> = rgb8.as_raw().to_vec();
@@ -46,7 +46,7 @@ impl ImageTexture {
             width: rgb8.width(),
             height: rgb8.height(),
             bytes_per_pixel: 3,
-            bytes_per_scanline: 3*rgb8.width(),
+            bytes_per_scanline: 3 * rgb8.width(),
         });
         asdf
     }
@@ -64,7 +64,8 @@ impl TextureColor for ImageTexture {
         let pixel = (j * self.bytes_per_scanline + i * self.bytes_per_pixel) as usize;
         color(
             color_scale * (self.data[pixel] as f64),
-            color_scale * (self.data[pixel+1] as f64),
-            color_scale * (self.data[pixel+2] as f64))
+            color_scale * (self.data[pixel + 1] as f64),
+            color_scale * (self.data[pixel + 2] as f64),
+        )
     }
 }

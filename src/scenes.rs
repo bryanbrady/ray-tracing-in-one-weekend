@@ -7,8 +7,8 @@ use crate::hittable::{
 };
 use crate::material::{dielectric::Dielectric, lambertian::Lambertian, metal::Metal};
 use crate::texture::{
-    checker::CheckerTexture, marble::MarbleTexture, noise::NoiseTexture, solidcolor::SolidColor,
-    turbulence::TurbulenceTexture, image::ImageTexture
+    checker::CheckerTexture, image::ImageTexture, marble::MarbleTexture, noise::NoiseTexture,
+    solidcolor::SolidColor, turbulence::TurbulenceTexture,
 };
 use crate::vec::{vec3, Vec3};
 use crate::{ASPECT_RATIO, GRID_SIZE};
@@ -288,7 +288,11 @@ pub fn random_world_earth() -> HittableList {
         hittables: Vec::new(),
     };
     let material_ground = Lambertian::new(SolidColor::new(0.5, 0.5, 0.5));
-    world.add(Sphere::new(vec3(0.0, -1000.0, 0.0), 1000.0, material_ground.clone()));
+    world.add(Sphere::new(
+        vec3(0.0, -1000.0, 0.0),
+        1000.0,
+        material_ground.clone(),
+    ));
 
     for a in -GRID_SIZE..GRID_SIZE {
         for b in -GRID_SIZE..GRID_SIZE {
@@ -307,7 +311,14 @@ pub fn random_world_earth() -> HittableList {
                         Color::random(0.0, 1.0, &mut rng) * Color::random(0.0, 1.0, &mut rng);
                     let material = Lambertian::new(SolidColor::new(albedo.r, albedo.g, albedo.b));
                     let center2 = center + vec3(0.0, rng.gen_range(0.0, 0.25), 0.0);
-                    world.add(MovingSphere::new(center, center2, 0.0, 1.0, 0.2, material.clone()));
+                    world.add(MovingSphere::new(
+                        center,
+                        center2,
+                        0.0,
+                        1.0,
+                        0.2,
+                        material.clone(),
+                    ));
                 } else if choose_mat < 0.90 {
                     // metal
                     let albedo = Color::random(0.5, 1.0, &mut rng);

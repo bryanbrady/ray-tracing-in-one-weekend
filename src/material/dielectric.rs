@@ -5,6 +5,7 @@ use crate::ray::Ray;
 use crate::vec::Vec3;
 use rand::prelude::*;
 use rand::rngs::SmallRng;
+use std::sync::Arc;
 
 #[derive(Debug, Clone)]
 pub struct Dielectric {
@@ -12,8 +13,8 @@ pub struct Dielectric {
 }
 
 impl Dielectric {
-    pub fn new(ir: f64) -> MaterialType {
-        MaterialType::from(Dielectric { ir: ir })
+    pub fn new(ir: f64) -> Arc<MaterialType> {
+        Arc::new(MaterialType::from(Dielectric { ir: ir }))
     }
 
     fn reflectance(cosine: f64, ref_idx: f64) -> f64 {

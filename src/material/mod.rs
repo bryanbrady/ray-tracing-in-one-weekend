@@ -33,10 +33,10 @@ pub enum MaterialType {
 
 impl Default for MaterialType {
     fn default() -> MaterialType {
-        MaterialType::from(
-            Lambertian { albedo: Texture::from(SolidColor {
-                color: color(0.0, 1.0, 1.0)
-            })
+        MaterialType::from(Lambertian {
+            albedo: Texture::from(SolidColor {
+                color: color(0.0, 1.0, 1.0),
+            }),
         })
         //Lambertian::new(Texture::default())
     }

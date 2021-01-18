@@ -4,6 +4,7 @@ use crate::ray::Ray;
 use crate::texture::{Texture, TextureColor};
 use crate::vec::Vec3;
 use rand::rngs::SmallRng;
+use std::sync::Arc;
 
 // Metal
 #[derive(Debug, Clone)]
@@ -13,11 +14,11 @@ pub struct Metal {
 }
 
 impl Metal {
-    pub fn new(albedo: Texture, fuzz: f64) -> MaterialType {
-        MaterialType::from(Metal {
+    pub fn new(albedo: Texture, fuzz: f64) -> Arc<MaterialType> {
+        Arc::new(MaterialType::from(Metal {
             albedo: albedo,
             fuzz: if fuzz < 1.0 { fuzz } else { 1.0 },
-        })
+        }))
     }
 }
 

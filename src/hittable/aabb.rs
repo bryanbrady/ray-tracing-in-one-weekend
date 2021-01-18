@@ -1,5 +1,3 @@
-use crate::hittable::{HitRecord, Hittable};
-use crate::material::MaterialType;
 use crate::ray::Ray;
 use crate::vec::Vec3;
 
@@ -45,8 +43,8 @@ impl Default for Aabb {
     }
 }
 
-impl Hittable for Aabb {
-    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+impl Aabb {
+    pub fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<(f64, f64)> {
         // x
         let inv_d = 1.0 / ray.direction.x;
         let t0 = (self.minimum.x - ray.origin.x) * inv_d;
@@ -80,19 +78,6 @@ impl Hittable for Aabb {
             return None;
         }
 
-        // Return dummy HitRecord
-        return Some(HitRecord {
-            t: 0.0,
-            u: 0.0,
-            v: 0.0,
-            point: Vec3::default(),
-            normal: Vec3::default(),
-            front_face: false,
-            mat: MaterialType::default(),
-        });
-    }
-
-    fn bounding_box(&self, _time0: f64, _time1: f64) -> Option<Aabb> {
-        Some(*self)
+        return Some((t_min, t_max));
     }
 }

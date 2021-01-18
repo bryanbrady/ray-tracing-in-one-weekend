@@ -8,6 +8,7 @@ use crate::material::MaterialType;
 use crate::ray::Ray;
 use crate::vec::Vec3;
 use enum_dispatch::enum_dispatch;
+use std::sync::Arc;
 
 pub mod aabb;
 pub mod bvh;
@@ -21,7 +22,7 @@ pub struct HitRecord {
     pub u: f64,
     pub v: f64,
     pub front_face: bool,
-    pub mat: MaterialType,
+    pub mat: Arc<MaterialType>,
 }
 
 #[enum_dispatch]
@@ -33,7 +34,6 @@ pub trait Hittable {
 #[enum_dispatch(Hittable)]
 #[derive(Debug, Clone)]
 pub enum Hittables {
-    Aabb,
     BvhNode,
     MovingSphere,
     Sphere,

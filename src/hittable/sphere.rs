@@ -2,17 +2,18 @@ use crate::hittable::{aabb::Aabb, HitRecord, Hittable, Hittables};
 use crate::material::MaterialType;
 use crate::ray::Ray;
 use crate::vec::{vec3, Vec3};
+use std::sync::Arc;
 
 #[derive(Debug, Clone)]
 pub struct Sphere {
     pub center: Vec3,
     pub radius: f64,
-    pub mat: MaterialType,
+    pub mat: Arc<MaterialType>,
 }
 
 impl Sphere {
     #[allow(dead_code)]
-    pub fn new(center: Vec3, radius: f64, mat: MaterialType) -> Hittables {
+    pub fn new(center: Vec3, radius: f64, mat: Arc<MaterialType>) -> Hittables {
         Hittables::from(Sphere {
             center: center,
             radius: radius,
@@ -97,7 +98,7 @@ pub struct MovingSphere {
     pub radius: f64,
     pub time0: f64,
     pub time1: f64,
-    pub mat: MaterialType,
+    pub mat: Arc<MaterialType>,
 }
 
 impl MovingSphere {
@@ -108,7 +109,7 @@ impl MovingSphere {
         t0: f64,
         t1: f64,
         radius: f64,
-        mat: MaterialType,
+        mat: Arc<MaterialType>,
     ) -> Hittables {
         Hittables::from(MovingSphere {
             center0: center0,
