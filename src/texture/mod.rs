@@ -1,12 +1,13 @@
 use crate::color::Color;
 use crate::texture::{
     checker::CheckerTexture, marble::MarbleTexture, noise::NoiseTexture, solidcolor::SolidColor,
-    turbulence::TurbulenceTexture,
+    turbulence::TurbulenceTexture, image::ImageTexture
 };
 use crate::vec::Vec3;
 use enum_dispatch::enum_dispatch;
 
 pub mod checker;
+pub mod image;
 pub mod marble;
 pub mod noise;
 pub mod perlin;
@@ -26,6 +27,7 @@ pub enum Texture {
     NoiseTexture,
     TurbulenceTexture,
     MarbleTexture,
+    ImageTexture,
 }
 
 impl Default for Texture {

@@ -23,8 +23,8 @@ use vec::vec3;
 #[allow(unused_imports)]
 use crate::scenes::{
     camera2, camera3, camera_blur, camera_final, camera_other, marble1, noise1,
-    random_checkered_world, random_world, random_world2, random_world_original, turbulence1,
-    world1, world2,
+    random_checkered_world, random_world, random_world2, random_world_original, random_world_earth, turbulence1,
+    world1, world2, earth
 };
 
 extern crate threadpool;
@@ -34,7 +34,7 @@ use threadpool::ThreadPool;
 
 // Image
 const ASPECT_RATIO: f64 = 16.0 / 9.0;
-const IMAGE_WIDTH: u32 = 1600;
+const IMAGE_WIDTH: u32 = 400;
 const IMAGE_HEIGHT: u32 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u32;
 const PIXELS: u32 = IMAGE_WIDTH * IMAGE_HEIGHT;
 const SAMPLES_PER_PIXEL: u64 = 100;
@@ -46,7 +46,7 @@ fn ray_color(ray: Ray, world: &Hittables, depth: u32, rng: &mut SmallRng) -> Col
     if depth <= 0 {
         return color(0.0, 0.0, 0.0);
     }
-    match world.hit(&ray, 0.0001, std::f64::INFINITY) {
+    match world.hit(&ray, 0.0001, std::f64::MAX) {
         Some(hit) => match hit.mat.scatter(&ray, &hit, rng) {
             Some(scatter) => {
                 return scatter.attenuation * ray_color(scatter.scattered, world, depth - 1, rng);
@@ -65,7 +65,7 @@ fn ray_color(ray: Ray, world: &Hittables, depth: u32, rng: &mut SmallRng) -> Col
 }
 
 fn main() -> Result<(), RecvError> {
-    // PROFILER.lock().unwrap().start("./rt.profile").expect("Couldn't start");
+    //PROFILER.lock().unwrap().start("./rt.profile").expect("Couldn't start");
 
     // Pixels
     let mut pixels = vec![color(0.0, 0.0, 0.0); PIXELS as usize];
@@ -77,7 +77,10 @@ fn main() -> Result<(), RecvError> {
     //let world = Hittables::from(BvhNode::new(random_checkered_world(), time0, time1));
     //let world = Hittables::from(BvhNode::new(noise1(), time0, time1));
     //let world = Hittables::from(BvhNode::new(turbulence1(), time0, time1));
-    let world = Hittables::from(BvhNode::new(marble1(), time0, time1));
+    //let world = Hittables::from(BvhNode::new(marble1(), time0, time1));
+    //let world = Hittables::from(BvhNode::new(earth(), time0, time1));
+    //let world = Hittables::from(BvhNode::new(random_world(), time0, time1));
+    let world = Hittables::from(BvhNode::new(random_world_original(), time0, time1));
 
     // Camera
     let camera = camera_final(time0, time1);
@@ -123,6 +126,6 @@ fn main() -> Result<(), RecvError> {
     }
 
     eprintln!("Done!\n");
-    // PROFILER.lock().unwrap().stop().expect("Couldn't stop");
+    //PROFILER.lock().unwrap().stop().expect("Couldn't stop");
     Ok(())
 }

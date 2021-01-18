@@ -42,7 +42,7 @@ impl Hittable for Sphere {
                 } else {
                     -outward_normal
                 };
-                let (u, v) = get_sphere_uv(&point);
+                let (u, v) = get_sphere_uv(&normal);
 
                 return Some(HitRecord {
                     t: t,
@@ -66,7 +66,7 @@ impl Hittable for Sphere {
                 } else {
                     -outward_normal
                 };
-                let (u, v) = get_sphere_uv(&point);
+                let (u, v) = get_sphere_uv(&normal);
 
                 return Some(HitRecord {
                     t: t,
@@ -147,7 +147,7 @@ impl Hittable for MovingSphere {
                 } else {
                     -outward_normal
                 };
-                let (u, v) = get_sphere_uv(&point);
+                let (u, v) = get_sphere_uv(&normal);
 
                 return Some(HitRecord {
                     t: t,
@@ -171,7 +171,7 @@ impl Hittable for MovingSphere {
                 } else {
                     -outward_normal
                 };
-                let (u, v) = get_sphere_uv(&point);
+                let (u, v) = get_sphere_uv(&normal);
 
                 return Some(HitRecord {
                     t: t,
@@ -202,7 +202,7 @@ impl Hittable for MovingSphere {
 
 pub fn get_sphere_uv(p: &Vec3) -> (f64, f64) {
     let theta = f64::acos(-p.y);
-    let phi = f64::atan2(-p.z, p.x + std::f64::consts::PI);
+    let phi = f64::atan2(-p.z, p.x) + std::f64::consts::PI;
     let u = phi / (2.0 * std::f64::consts::PI);
     let v = theta / std::f64::consts::PI;
     (u, v)

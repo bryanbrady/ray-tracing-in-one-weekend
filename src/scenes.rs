@@ -8,7 +8,7 @@ use crate::hittable::{
 use crate::material::{dielectric::Dielectric, lambertian::Lambertian, metal::Metal};
 use crate::texture::{
     checker::CheckerTexture, marble::MarbleTexture, noise::NoiseTexture, solidcolor::SolidColor,
-    turbulence::TurbulenceTexture,
+    turbulence::TurbulenceTexture, image::ImageTexture
 };
 use crate::vec::{vec3, Vec3};
 use crate::{ASPECT_RATIO, GRID_SIZE};
@@ -100,6 +100,20 @@ pub fn marble1() -> HittableList {
 }
 
 #[allow(dead_code)]
+pub fn earth() -> HittableList {
+    let earth_texture = Lambertian::new(ImageTexture::new("assets/earthmap.jpeg"));
+    let texture = Lambertian::new(TurbulenceTexture::new(0, 4.0));
+    let sphere1 = Sphere::new(vec3(0.0, -1000.0, 0.0), 1000.0, texture.clone());
+    let sphere2 = Sphere::new(vec3(0.0, 1.0, 0.0), 1.0, earth_texture.clone());
+    let mut world = HittableList {
+        hittables: Vec::new(),
+    };
+    world.add(sphere1);
+    world.add(sphere2);
+    return world;
+}
+
+#[allow(dead_code)]
 pub fn random_world_original() -> HittableList {
     let mut rng = SmallRng::from_entropy();
     let mut world = HittableList {
@@ -144,17 +158,12 @@ pub fn random_world_original() -> HittableList {
         }
     }
 
-    world.add(Sphere::new(vec3(0.0, 1.0, 0.0), 1.0, Dielectric::new(1.5)));
-    world.add(Sphere::new(
-        vec3(-4.0, 1.0, 0.0),
-        1.0,
-        Lambertian::new(SolidColor::new(0.4, 0.2, 0.1)),
-    ));
-    world.add(Sphere::new(
-        vec3(4.0, 1.0, 0.0),
-        1.0,
-        Metal::new(SolidColor::new(0.7, 0.6, 0.5), 0.0),
-    ));
+    let mat1 = Dielectric::new(1.5);
+    let mat2 = Lambertian::new(SolidColor::new(0.4, 0.2, 0.1));
+    let mat3 = Metal::new(SolidColor::new(0.7, 0.6, 0.5), 0.0);
+    world.add(Sphere::new(vec3(0.0, 1.0, 0.0), 1.0, mat1));
+    world.add(Sphere::new(vec3(-4.0, 1.0, 0.0), 1.0, mat2));
+    world.add(Sphere::new(vec3(4.0, 1.0, 0.0), 1.0, mat3));
     return world;
 }
 
@@ -205,17 +214,13 @@ pub fn random_checkered_world() -> HittableList {
         }
     }
 
+    let mat1 = Dielectric::new(1.5);
+    let mat2 = Lambertian::new(SolidColor::new(0.4, 0.2, 0.1));
+    let mat3 = Metal::new(SolidColor::new(0.7, 0.6, 0.5), 0.0);
+    world.add(Sphere::new(vec3(0.0, 1.0, 0.0), 1.0, mat1));
+    world.add(Sphere::new(vec3(-4.0, 1.0, 0.0), 1.0, mat2));
+    world.add(Sphere::new(vec3(4.0, 1.0, 0.0), 1.0, mat3));
     world.add(Sphere::new(vec3(0.0, 1.0, 0.0), 1.0, Dielectric::new(1.5)));
-    world.add(Sphere::new(
-        vec3(-4.0, 1.0, 0.0),
-        1.0,
-        Lambertian::new(SolidColor::new(0.4, 0.2, 0.1)),
-    ));
-    world.add(Sphere::new(
-        vec3(4.0, 1.0, 0.0),
-        1.0,
-        Metal::new(SolidColor::new(0.7, 0.6, 0.5), 0.0),
-    ));
     return world;
 }
 
@@ -265,17 +270,72 @@ pub fn random_world() -> HittableList {
         }
     }
 
+    let mat1 = Dielectric::new(1.5);
+    let mat2 = Lambertian::new(SolidColor::new(0.4, 0.2, 0.1));
+    let mat3 = Metal::new(SolidColor::new(0.7, 0.6, 0.5), 0.0);
+    world.add(Sphere::new(vec3(0.0, 1.0, 0.0), 1.0, mat1));
+    world.add(Sphere::new(vec3(-4.0, 1.0, 0.0), 1.0, mat2));
+    world.add(Sphere::new(vec3(4.0, 1.0, 0.0), 1.0, mat3));
     world.add(Sphere::new(vec3(0.0, 1.0, 0.0), 1.0, Dielectric::new(1.5)));
-    world.add(Sphere::new(
-        vec3(-4.0, 1.0, 0.0),
-        1.0,
-        Lambertian::new(SolidColor::new(0.4, 0.2, 0.1)),
-    ));
-    world.add(Sphere::new(
-        vec3(4.0, 1.0, 0.0),
-        1.0,
-        Metal::new(SolidColor::new(0.7, 0.6, 0.5), 0.0),
-    ));
+    world.add(Sphere::new(vec3(0.0, 1.0, 0.0), 1.0, Dielectric::new(1.5)));
+    return world;
+}
+
+#[allow(dead_code)]
+pub fn random_world_earth() -> HittableList {
+    let mut rng = SmallRng::from_entropy();
+    let mut world = HittableList {
+        hittables: Vec::new(),
+    };
+    let material_ground = Lambertian::new(SolidColor::new(0.5, 0.5, 0.5));
+    world.add(Sphere::new(vec3(0.0, -1000.0, 0.0), 1000.0, material_ground.clone()));
+
+    for a in -GRID_SIZE..GRID_SIZE {
+        for b in -GRID_SIZE..GRID_SIZE {
+            let choose_mat: f64 = rng.gen::<f64>();
+            let center = Vec3 {
+                x: (a as f64) + 0.9 * rng.gen::<f64>(),
+                y: 0.2,
+                z: (b as f64) + 0.9 * rng.gen::<f64>(),
+            };
+            let some_point = vec3(4.0, 0.2, 0.0);
+
+            if (center - some_point).length() > 0.9 {
+                if choose_mat < 0.7 {
+                    // diffuse
+                    let albedo =
+                        Color::random(0.0, 1.0, &mut rng) * Color::random(0.0, 1.0, &mut rng);
+                    let material = Lambertian::new(SolidColor::new(albedo.r, albedo.g, albedo.b));
+                    let center2 = center + vec3(0.0, rng.gen_range(0.0, 0.25), 0.0);
+                    world.add(MovingSphere::new(center, center2, 0.0, 1.0, 0.2, material.clone()));
+                } else if choose_mat < 0.90 {
+                    // metal
+                    let albedo = Color::random(0.5, 1.0, &mut rng);
+                    let fuzz = rng.gen_range(0.0, 0.5);
+                    let material = Metal::new(SolidColor::new(albedo.r, albedo.g, albedo.b), fuzz);
+                    world.add(Sphere::new(center, 0.2, material.clone()));
+                } else if choose_mat < 0.95 {
+                    // earth
+                    // let material = Lambertian::new(ImageTexture::new("assets/earthmap.jpeg"));
+                    let material = Lambertian::new(SolidColor::new(0.0, 0.0, 0.0));
+                    world.add(Sphere::new(center, 0.2, material.clone()));
+                } else {
+                    // glass
+                    let material = Dielectric::new(1.5);
+                    world.add(Sphere::new(center, 0.2, material.clone()));
+                }
+            }
+        }
+    }
+
+    let mat1 = Dielectric::new(1.5);
+    let mat2 = Lambertian::new(SolidColor::new(0.4, 0.2, 0.1));
+    let mat3 = Metal::new(SolidColor::new(0.7, 0.6, 0.5), 0.0);
+    world.add(Sphere::new(vec3(0.0, 1.0, 0.0), 1.0, mat1.clone()));
+    world.add(Sphere::new(vec3(-4.0, 1.0, 0.0), 1.0, mat2));
+    world.add(Sphere::new(vec3(4.0, 1.0, 0.0), 1.0, mat3));
+    world.add(Sphere::new(vec3(0.0, 1.0, 0.0), 1.0, mat1.clone()));
+    world.add(Sphere::new(vec3(0.0, 1.0, 0.0), 1.0, mat1.clone()));
     return world;
 }
 

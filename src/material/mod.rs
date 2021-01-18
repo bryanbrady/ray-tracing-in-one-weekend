@@ -1,7 +1,7 @@
-use crate::color::Color;
+use crate::color::{color, Color};
 use crate::hittable::HitRecord;
 use crate::ray::Ray;
-use crate::texture::Texture;
+use crate::texture::{solidcolor::SolidColor, Texture};
 use enum_dispatch::enum_dispatch;
 use rand::rngs::SmallRng;
 
@@ -33,6 +33,11 @@ pub enum MaterialType {
 
 impl Default for MaterialType {
     fn default() -> MaterialType {
-        Lambertian::new(Texture::default())
+        MaterialType::from(
+            Lambertian { albedo: Texture::from(SolidColor {
+                color: color(0.0, 1.0, 1.0)
+            })
+        })
+        //Lambertian::new(Texture::default())
     }
 }

@@ -13,6 +13,7 @@ pub struct Lambertian {
 
 impl Lambertian {
     pub fn new(albedo: Texture) -> MaterialType {
+        //eprintln!("Lambertian::new(albedo: {:?}", albedo);
         MaterialType::from(Lambertian { albedo: albedo })
     }
 }
