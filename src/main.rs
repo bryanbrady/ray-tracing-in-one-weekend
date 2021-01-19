@@ -18,13 +18,12 @@ use color::{color, write_color, Color};
 use hittable::{bvh::BvhNode, Hittable, Hittables};
 use material::Material;
 use ray::Ray;
-use vec::vec3;
 
 #[allow(unused_imports)]
 use crate::scenes::{
-    camera2, camera3, camera_blur, camera_final, camera_other, earth, marble1, noise1,
+    camera2, camera3, camera_blur, camera_final, camera_light, camera_other, earth, marble1, noise1,
     random_checkered_world, random_world, random_world2, random_world_earth, random_world_original,
-    turbulence1, world1, world2,
+    turbulence1, world1, world2, simple_light
 };
 
 extern crate threadpool;
@@ -37,29 +36,29 @@ const ASPECT_RATIO: f64 = 16.0 / 9.0;
 const IMAGE_WIDTH: u32 = 400;
 const IMAGE_HEIGHT: u32 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u32;
 const PIXELS: u32 = IMAGE_WIDTH * IMAGE_HEIGHT;
-const SAMPLES_PER_PIXEL: u64 = 100;
+const SAMPLES_PER_PIXEL: u64 = 400;
 const MAX_DEPTH: u32 = 50;
 const GRID_SIZE: i32 = 11;
 
 #[allow(dead_code)]
-fn ray_color(ray: Ray, world: &Hittables, depth: u32, rng: &mut SmallRng) -> Color {
+fn ray_color(ray: Ray, background: Color, world: &Hittables, depth: u32, rng: &mut SmallRng) -> Color {
     if depth <= 0 {
         return color(0.0, 0.0, 0.0);
     }
     match world.hit(&ray, 0.0001, std::f64::MAX) {
-        Some(hit) => match hit.mat.scatter(&ray, &hit, rng) {
-            Some(scatter) => {
-                return scatter.attenuation * ray_color(scatter.scattered, world, depth - 1, rng);
-            }
-            None => {
-                return color(0.0, 0.0, 0.0);
+        Some(hit) => {
+            let emitted = hit.mat.emitted(hit.u, hit.v, hit.point);
+            match hit.mat.scatter(&ray, &hit, rng) {
+                Some(scatter) => {
+                    return emitted + scatter.attenuation * ray_color(scatter.scattered, background, world, depth - 1, rng);
+                }
+                None => {
+                    return emitted;
+                }
             }
         },
         None => {
-            let unit = ray.direction.unit_vector();
-            let t = 0.5 * (unit.y + 1.0);
-            let c = (1.0 - t) * vec3(1.0, 1.0, 1.0) + t * vec3(0.5, 0.7, 1.0);
-            return color(c.x, c.y, c.z);
+            return background;
         }
     }
 }
@@ -74,10 +73,14 @@ fn main() -> Result<(), RecvError> {
     let (time0, time1) = (0.0, 0.0);
 
     // World
-    let world = Hittables::from(BvhNode::new(random_world_earth(), time0, time1));
+    //let world = Hittables::from(BvhNode::new(random_world_earth(), time0, time1));
+    // let world = Hittables::from(BvhNode::new(marble1(), time0, time1));
+    let world = Hittables::from(BvhNode::new(simple_light(), time0, time1));
 
     // Camera
-    let camera = camera_final(time0, time1);
+    //let camera = camera_final(time0, time1);
+    let camera = camera_light(time0, time1);
+    let background = camera.background;
 
     // Parallelize
     let pool = ThreadPool::new(num_cpus::get() - 1);
@@ -102,7 +105,7 @@ fn main() -> Result<(), RecvError> {
                     let u: f64 = ((w as f64) + ur) / ((IMAGE_WIDTH - 1) as f64);
                     let v: f64 = ((h as f64) + vr) / ((IMAGE_HEIGHT - 1) as f64);
                     let r = camera.get_ray(u, v, &mut rng);
-                    pixel_color += ray_color(r, &myworld, MAX_DEPTH, &mut rng);
+                    pixel_color += ray_color(r, background, &myworld, MAX_DEPTH, &mut rng);
                 }
                 tx.send((w, h, pixel_color)).expect("Could not send data!");
             }

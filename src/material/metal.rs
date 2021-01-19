@@ -1,3 +1,4 @@
+use crate::color::{color, Color};
 use crate::hittable::HitRecord;
 use crate::material::{Material, MaterialType, Scatter};
 use crate::ray::Ray;
@@ -38,5 +39,9 @@ impl Material for Metal {
             });
         }
         return None;
+    }
+
+    fn emitted(&self, _u: f64, _v: f64, _p: Vec3) -> Color {
+        return color(0.0, 0.0, 0.0);
     }
 }

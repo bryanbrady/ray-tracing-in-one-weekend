@@ -1,3 +1,4 @@
+use crate::color::Color;
 use crate::ray::Ray;
 use crate::util::*;
 use crate::vec::Vec3;
@@ -15,6 +16,7 @@ pub struct Camera {
     lens_radius: f64,
     time0: f64,
     time1: f64,
+    pub background: Color
 }
 
 impl Camera {
@@ -28,6 +30,7 @@ impl Camera {
         focus_dist: f64,
         t0: f64,
         t1: f64,
+        background: Color,
     ) -> Camera {
         let theta = degrees_to_radians(vfov);
         let h = f64::tan(theta / 2.0);
@@ -52,6 +55,7 @@ impl Camera {
             lens_radius: aperture / 2.0,
             time0: t0,
             time1: t1,
+            background: background,
         }
     }
 

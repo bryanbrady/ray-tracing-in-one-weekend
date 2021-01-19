@@ -13,3 +13,12 @@ impl Ray {
         self.origin + self.direction * _t
     }
 }
+
+pub fn face_normal(ray: &Ray, normal: Vec3) -> (bool, Vec3) {
+    let front_face = ray.direction.dot(normal) < 0.0;
+    if front_face {
+        (true, normal)
+    } else {
+        (false, -normal)
+    }
+}

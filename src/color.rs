@@ -36,6 +36,18 @@ impl ops::AddAssign<Color> for Color {
     }
 }
 
+impl ops::Add<Color> for Color {
+    type Output = Color;
+
+    fn add(self, _rhs: Color) -> Self::Output {
+        Color {
+            r: self.r + _rhs.r,
+            g: self.g + _rhs.g,
+            b: self.b + _rhs.b,
+        }
+    }
+}
+
 impl ops::Mul<f64> for Color {
     type Output = Color;
 

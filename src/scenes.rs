@@ -3,9 +3,10 @@ use crate::color::{color, Color};
 use crate::hittable::{
     hittable_list::HittableList,
     sphere::{MovingSphere, Sphere},
+    xy_rect::XyRect,
     Hittables,
 };
-use crate::material::{dielectric::Dielectric, lambertian::Lambertian, metal::Metal};
+use crate::material::{dielectric::Dielectric, lambertian::Lambertian, metal::Metal, diffuse::Diffuse};
 use crate::texture::{
     checker::CheckerTexture, image::ImageTexture, marble::MarbleTexture, noise::NoiseTexture,
     solidcolor::SolidColor, turbulence::TurbulenceTexture,
@@ -327,8 +328,7 @@ pub fn random_world_earth() -> HittableList {
                     world.add(Sphere::new(center, 0.2, material.clone()));
                 } else if choose_mat < 0.95 {
                     // earth
-                    // let material = Lambertian::new(ImageTexture::new("assets/earthmap.jpeg"));
-                    let material = Lambertian::new(SolidColor::new(0.0, 0.0, 0.0));
+                    let material = Lambertian::new(ImageTexture::new("assets/earthmap.jpeg"));
                     world.add(Sphere::new(center, 0.2, material.clone()));
                 } else {
                     // glass
@@ -339,6 +339,8 @@ pub fn random_world_earth() -> HittableList {
         }
     }
 
+    // let difflight = Diffuse::new(SolidColor::new(4.0, 4.0, 4.0));
+    // let rect = XyRect::new(3.0, 5.0, 1.0, 3.0, -2.0, difflight.clone());
     let mat1 = Dielectric::new(1.5);
     let mat2 = Lambertian::new(SolidColor::new(0.4, 0.2, 0.1));
     let mat3 = Metal::new(SolidColor::new(0.7, 0.6, 0.5), 0.0);
@@ -347,6 +349,7 @@ pub fn random_world_earth() -> HittableList {
     world.add(Sphere::new(vec3(4.0, 1.0, 0.0), 1.0, mat3));
     world.add(Sphere::new(vec3(0.0, 1.0, 0.0), 1.0, mat1.clone()));
     world.add(Sphere::new(vec3(0.0, 1.0, 0.0), 1.0, mat1.clone()));
+    // world.add(rect);
     return world;
 }
 
@@ -404,6 +407,25 @@ pub fn random_world2() -> HittableList {
 }
 
 #[allow(dead_code)]
+pub fn simple_light() -> HittableList {
+    let texture = Lambertian::new(MarbleTexture::new(0, 4.0));
+    let sphere1 = Sphere::new(vec3(0.0, -1000.0, 0.0), 1000.0, texture.clone());
+    let sphere2 = Sphere::new(vec3(0.0, 2.0, 0.0), 2.0, texture.clone());
+
+    let difflight = Diffuse::new(SolidColor::new(4.0, 4.0, 4.0));
+    let rect = XyRect::new(3.0, 5.0, 1.0, 3.0, -2.0, difflight.clone());
+    let sphere3 = Sphere::new(vec3(0.0, 7.0, 0.0), 2.0, difflight.clone());
+    let mut world = HittableList {
+        hittables: Vec::new(),
+    };
+    world.add(sphere1);
+    world.add(sphere2);
+    world.add(sphere3);
+    world.add(rect);
+    return world;
+}
+
+#[allow(dead_code)]
 pub fn camera2(t0: f64, t1: f64) -> Camera {
     let vfov: f64 = 20.0;
     let lookfrom = vec3(3.0, 3.0, 2.0);
@@ -411,6 +433,7 @@ pub fn camera2(t0: f64, t1: f64) -> Camera {
     let vup = vec3(0.0, 1.0, 0.0);
     let aperture = 2.0;
     let dist_to_focus = (lookfrom - lookat).length();
+    let background = color(0.7, 0.8, 1.0);
     return Camera::new(
         lookfrom,
         lookat,
@@ -421,6 +444,7 @@ pub fn camera2(t0: f64, t1: f64) -> Camera {
         dist_to_focus,
         t0,
         t1,
+        background
     );
 }
 
@@ -432,6 +456,7 @@ pub fn camera3(t0: f64, t1: f64) -> Camera {
     let vup = vec3(0.0, 1.0, 0.0);
     let aperture = 0.1;
     let dist_to_focus = 10.0;
+    let background = color(0.7, 0.8, 1.0);
     return Camera::new(
         lookfrom,
         lookat,
@@ -442,6 +467,7 @@ pub fn camera3(t0: f64, t1: f64) -> Camera {
         dist_to_focus,
         t0,
         t1,
+        background
     );
 }
 
@@ -453,6 +479,7 @@ pub fn camera_final(t0: f64, t1: f64) -> Camera {
     let vup = vec3(0.0, 1.0, 0.0);
     let aperture = 0.1;
     let dist_to_focus = 12.0;
+    let background = color(0.7, 0.8, 1.0);
     return Camera::new(
         lookfrom,
         lookat,
@@ -463,6 +490,30 @@ pub fn camera_final(t0: f64, t1: f64) -> Camera {
         dist_to_focus,
         t0,
         t1,
+        background
+    );
+}
+
+#[allow(dead_code)]
+pub fn camera_light(t0: f64, t1: f64) -> Camera {
+    let vfov: f64 = 20.0;
+    let lookfrom = vec3(13.0, 2.0, 3.0);
+    let lookat = vec3(0.0, 2.0, 0.0);
+    let vup = vec3(0.0, 1.0, 0.0);
+    let aperture = 0.1;
+    let dist_to_focus = 10.0;
+    let background = color(0.0, 0.0, 0.0);
+    return Camera::new(
+        lookfrom,
+        lookat,
+        vup,
+        vfov,
+        ASPECT_RATIO,
+        aperture,
+        dist_to_focus,
+        t0,
+        t1,
+        background
     );
 }
 
@@ -474,6 +525,7 @@ pub fn camera_blur(t0: f64, t1: f64) -> Camera {
     let vup = vec3(0.0, 1.0, 0.0);
     let aperture = 0.1;
     let dist_to_focus = 10.0;
+    let background = color(0.7, 0.8, 1.0);
     return Camera::new(
         lookfrom,
         lookat,
@@ -484,6 +536,7 @@ pub fn camera_blur(t0: f64, t1: f64) -> Camera {
         dist_to_focus,
         t0,
         t1,
+        background
     );
 }
 
@@ -495,6 +548,7 @@ pub fn camera_other(t0: f64, t1: f64) -> Camera {
     let vup = vec3(0.0, 1.0, 0.0);
     let aperture = 0.1;
     let dist_to_focus = 18.0;
+    let background = color(0.7, 0.8, 1.0);
     return Camera::new(
         lookfrom,
         lookat,
@@ -505,5 +559,6 @@ pub fn camera_other(t0: f64, t1: f64) -> Camera {
         dist_to_focus,
         t0,
         t1,
+        background
     );
 }

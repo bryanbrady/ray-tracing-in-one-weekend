@@ -1,6 +1,6 @@
 use crate::hittable::{aabb::Aabb, HitRecord, Hittable, Hittables};
 use crate::material::MaterialType;
-use crate::ray::Ray;
+use crate::ray::{face_normal, Ray};
 use crate::vec::{vec3, Vec3};
 use std::sync::Arc;
 
@@ -36,13 +36,8 @@ impl Hittable for Sphere {
             if temp1 < t_max && temp1 > t_min {
                 let t = temp1;
                 let point = ray.at(temp1);
-                let outward_normal = (point - self.center) / self.radius;
-                let front_face = ray.direction.dot(outward_normal) < 0.0;
-                let normal = if front_face {
-                    outward_normal
-                } else {
-                    -outward_normal
-                };
+                let normal = (point - self.center) / self.radius;
+                let (front_face, normal) = face_normal(ray, normal);
                 let (u, v) = get_sphere_uv(&normal);
 
                 return Some(HitRecord {
@@ -60,13 +55,8 @@ impl Hittable for Sphere {
             if temp2 < t_max && temp2 > t_min {
                 let t = temp2;
                 let point = ray.at(temp2);
-                let outward_normal = (point - self.center) / self.radius;
-                let front_face = ray.direction.dot(outward_normal) < 0.0;
-                let normal = if front_face {
-                    outward_normal
-                } else {
-                    -outward_normal
-                };
+                let normal = (point - self.center) / self.radius;
+                let (front_face, normal) = face_normal(ray, normal);
                 let (u, v) = get_sphere_uv(&normal);
 
                 return Some(HitRecord {
@@ -141,13 +131,8 @@ impl Hittable for MovingSphere {
             if temp1 < t_max && temp1 > t_min {
                 let t = temp1;
                 let point = ray.at(temp1);
-                let outward_normal = (point - self.center(ray.time)) / self.radius;
-                let front_face = ray.direction.dot(outward_normal) < 0.0;
-                let normal = if front_face {
-                    outward_normal
-                } else {
-                    -outward_normal
-                };
+                let normal = (point - self.center(ray.time)) / self.radius;
+                let (front_face, normal) = face_normal(ray, normal);
                 let (u, v) = get_sphere_uv(&normal);
 
                 return Some(HitRecord {
@@ -165,13 +150,8 @@ impl Hittable for MovingSphere {
             if temp2 < t_max && temp2 > t_min {
                 let t = temp2;
                 let point = ray.at(temp2);
-                let outward_normal = (point - self.center(ray.time)) / self.radius;
-                let front_face = ray.direction.dot(outward_normal) < 0.0;
-                let normal = if front_face {
-                    outward_normal
-                } else {
-                    -outward_normal
-                };
+                let normal = (point - self.center(ray.time)) / self.radius;
+                let (front_face, normal) = face_normal(ray, normal);
                 let (u, v) = get_sphere_uv(&normal);
 
                 return Some(HitRecord {
