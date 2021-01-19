@@ -4,6 +4,8 @@ use crate::hittable::{
     hittable_list::HittableList,
     sphere::{MovingSphere, Sphere},
     xy_rect::XyRect,
+    xz_rect::XzRect,
+    yz_rect::YzRect,
 };
 use crate::material::MaterialType;
 use crate::ray::Ray;
@@ -16,6 +18,8 @@ pub mod bvh;
 pub mod hittable_list;
 pub mod sphere;
 pub mod xy_rect;
+pub mod xz_rect;
+pub mod yz_rect;
 
 pub struct HitRecord {
     pub point: Vec3,
@@ -41,4 +45,6 @@ pub enum Hittables {
     Sphere,
     HittableList,
     XyRect,
+    XzRect,
+    YzRect,
 }

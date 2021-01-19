@@ -13,11 +13,9 @@ pub struct Diffuse {
     pub emit: Texture,
 }
 
-impl Diffuse{
+impl Diffuse {
     pub fn new(emit: Texture) -> Arc<MaterialType> {
-        Arc::new(MaterialType::from(Diffuse{
-            emit: emit,
-        }))
+        Arc::new(MaterialType::from(Diffuse { emit: emit }))
     }
 }
 

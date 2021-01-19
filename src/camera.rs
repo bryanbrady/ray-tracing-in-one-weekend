@@ -16,7 +16,7 @@ pub struct Camera {
     lens_radius: f64,
     time0: f64,
     time1: f64,
-    pub background: Color
+    pub background: Color,
 }
 
 impl Camera {

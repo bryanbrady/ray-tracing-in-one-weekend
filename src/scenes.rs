@@ -4,9 +4,13 @@ use crate::hittable::{
     hittable_list::HittableList,
     sphere::{MovingSphere, Sphere},
     xy_rect::XyRect,
+    xz_rect::XzRect,
+    yz_rect::YzRect,
     Hittables,
 };
-use crate::material::{dielectric::Dielectric, lambertian::Lambertian, metal::Metal, diffuse::Diffuse};
+use crate::material::{
+    dielectric::Dielectric, diffuse::Diffuse, lambertian::Lambertian, metal::Metal,
+};
 use crate::texture::{
     checker::CheckerTexture, image::ImageTexture, marble::MarbleTexture, noise::NoiseTexture,
     solidcolor::SolidColor, turbulence::TurbulenceTexture,
@@ -426,6 +430,33 @@ pub fn simple_light() -> HittableList {
 }
 
 #[allow(dead_code)]
+pub fn cornell_box() -> HittableList {
+    let red = Lambertian::new(SolidColor::new(0.65, 0.05, 0.05));
+    let white = Lambertian::new(SolidColor::new(0.73, 0.73, 0.73));
+    let green = Lambertian::new(SolidColor::new(0.12, 0.45, 0.15));
+    let light = Diffuse::new(SolidColor::new(15.0, 15.0, 15.0));
+
+    let wall1 = YzRect::new(0.0, 555.0, 0.0, 555.0, 555.0, green.clone());
+    let wall2 = YzRect::new(0.0, 555.0, 0.0, 555.0, 0.0, red.clone());
+    let wall3 = XzRect::new(0.0, 555.0, 0.0, 555.0, 0.0, white.clone());
+    let wall4 = XzRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white.clone());
+    let wall5 = XyRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white.clone());
+
+    let light = XzRect::new(213.0, 343.0, 227.0, 332.0, 554.0, light.clone());
+
+    let mut world = HittableList {
+        hittables: Vec::new(),
+    };
+    world.add(wall1);
+    world.add(wall2);
+    world.add(wall3);
+    world.add(wall4);
+    world.add(wall5);
+    world.add(light);
+    return world;
+}
+
+#[allow(dead_code)]
 pub fn camera2(t0: f64, t1: f64) -> Camera {
     let vfov: f64 = 20.0;
     let lookfrom = vec3(3.0, 3.0, 2.0);
@@ -444,7 +475,7 @@ pub fn camera2(t0: f64, t1: f64) -> Camera {
         dist_to_focus,
         t0,
         t1,
-        background
+        background,
     );
 }
 
@@ -467,7 +498,7 @@ pub fn camera3(t0: f64, t1: f64) -> Camera {
         dist_to_focus,
         t0,
         t1,
-        background
+        background,
     );
 }
 
@@ -490,7 +521,7 @@ pub fn camera_final(t0: f64, t1: f64) -> Camera {
         dist_to_focus,
         t0,
         t1,
-        background
+        background,
     );
 }
 
@@ -513,7 +544,30 @@ pub fn camera_light(t0: f64, t1: f64) -> Camera {
         dist_to_focus,
         t0,
         t1,
-        background
+        background,
+    );
+}
+
+#[allow(dead_code)]
+pub fn camera_cornell_box(t0: f64, t1: f64) -> Camera {
+    let vfov: f64 = 40.0;
+    let lookfrom = vec3(278.0, 278.0, -800.0);
+    let lookat = vec3(278.0, 278.0, 0.0);
+    let vup = vec3(0.0, 1.0, 0.0);
+    let aperture = 0.1;
+    let dist_to_focus = 10.0;
+    let background = color(0.0, 0.0, 0.0);
+    return Camera::new(
+        lookfrom,
+        lookat,
+        vup,
+        vfov,
+        ASPECT_RATIO,
+        aperture,
+        dist_to_focus,
+        t0,
+        t1,
+        background,
     );
 }
 
@@ -536,7 +590,7 @@ pub fn camera_blur(t0: f64, t1: f64) -> Camera {
         dist_to_focus,
         t0,
         t1,
-        background
+        background,
     );
 }
 
@@ -559,6 +613,6 @@ pub fn camera_other(t0: f64, t1: f64) -> Camera {
         dist_to_focus,
         t0,
         t1,
-        background
+        background,
     );
 }

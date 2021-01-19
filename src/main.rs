@@ -21,9 +21,9 @@ use ray::Ray;
 
 #[allow(unused_imports)]
 use crate::scenes::{
-    camera2, camera3, camera_blur, camera_final, camera_light, camera_other, earth, marble1, noise1,
-    random_checkered_world, random_world, random_world2, random_world_earth, random_world_original,
-    turbulence1, world1, world2, simple_light
+    camera2, camera3, camera_blur, camera_cornell_box, camera_final, camera_light, camera_other,
+    cornell_box, earth, marble1, noise1, random_checkered_world, random_world, random_world2,
+    random_world_earth, random_world_original, simple_light, turbulence1, world1, world2,
 };
 
 extern crate threadpool;
@@ -41,7 +41,13 @@ const MAX_DEPTH: u32 = 50;
 const GRID_SIZE: i32 = 11;
 
 #[allow(dead_code)]
-fn ray_color(ray: Ray, background: Color, world: &Hittables, depth: u32, rng: &mut SmallRng) -> Color {
+fn ray_color(
+    ray: Ray,
+    background: Color,
+    world: &Hittables,
+    depth: u32,
+    rng: &mut SmallRng,
+) -> Color {
     if depth <= 0 {
         return color(0.0, 0.0, 0.0);
     }
@@ -50,13 +56,15 @@ fn ray_color(ray: Ray, background: Color, world: &Hittables, depth: u32, rng: &m
             let emitted = hit.mat.emitted(hit.u, hit.v, hit.point);
             match hit.mat.scatter(&ray, &hit, rng) {
                 Some(scatter) => {
-                    return emitted + scatter.attenuation * ray_color(scatter.scattered, background, world, depth - 1, rng);
+                    return emitted
+                        + scatter.attenuation
+                            * ray_color(scatter.scattered, background, world, depth - 1, rng);
                 }
                 None => {
                     return emitted;
                 }
             }
-        },
+        }
         None => {
             return background;
         }
@@ -75,11 +83,13 @@ fn main() -> Result<(), RecvError> {
     // World
     //let world = Hittables::from(BvhNode::new(random_world_earth(), time0, time1));
     // let world = Hittables::from(BvhNode::new(marble1(), time0, time1));
-    let world = Hittables::from(BvhNode::new(simple_light(), time0, time1));
+    //let world = Hittables::from(BvhNode::new(simple_light(), time0, time1));
+    let world = Hittables::from(BvhNode::new(cornell_box(), time0, time1));
 
     // Camera
+    let camera = camera_cornell_box(time0, time1);
     //let camera = camera_final(time0, time1);
-    let camera = camera_light(time0, time1);
+    //let camera = camera_light(time0, time1);
     let background = camera.background;
 
     // Parallelize

@@ -7,14 +7,14 @@ use enum_dispatch::enum_dispatch;
 use rand::rngs::SmallRng;
 
 use crate::material::dielectric::Dielectric;
+use crate::material::diffuse::Diffuse;
 use crate::material::lambertian::Lambertian;
 use crate::material::metal::Metal;
-use crate::material::diffuse::Diffuse;
 
 pub mod dielectric;
+pub mod diffuse;
 pub mod lambertian;
 pub mod metal;
-pub mod diffuse;
 
 #[derive(Debug)]
 pub struct Scatter {

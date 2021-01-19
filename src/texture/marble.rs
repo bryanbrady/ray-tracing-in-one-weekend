@@ -22,6 +22,6 @@ impl TextureColor for MarbleTexture {
     fn value(&self, _u: f64, _v: f64, p: Vec3) -> Color {
         color(1.0, 1.0, 1.0)
             * 0.5
-            * (1.0 + f64::sin(self.scale * p.z  + 10. * self.noise.turb(p * self.scale, 7)))
+            * (1.0 + f64::sin(self.scale * p.z + 10. * self.noise.turb(p * self.scale, 7)))
     }
 }
