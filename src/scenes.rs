@@ -3,9 +3,9 @@ use crate::color::{color, Color};
 use crate::hittable::{
     hittable_list::HittableList,
     sphere::{MovingSphere, Sphere},
-    xy_rect::XyRect,
-    xz_rect::XzRect,
-    yz_rect::YzRect,
+    rect::XyRect,
+    rect::XzRect,
+    rect::YzRect,
     Hittables,
 };
 use crate::material::{

@@ -3,9 +3,9 @@ use crate::hittable::{
     bvh::BvhNode,
     hittable_list::HittableList,
     sphere::{MovingSphere, Sphere},
-    xy_rect::XyRect,
-    xz_rect::XzRect,
-    yz_rect::YzRect,
+    rect::XyRect,
+    rect::XzRect,
+    rect::YzRect,
 };
 use crate::material::MaterialType;
 use crate::ray::Ray;
@@ -17,9 +17,7 @@ pub mod aabb;
 pub mod bvh;
 pub mod hittable_list;
 pub mod sphere;
-pub mod xy_rect;
-pub mod xz_rect;
-pub mod yz_rect;
+pub mod rect;
 
 pub struct HitRecord {
     pub point: Vec3,
