@@ -1,11 +1,12 @@
 use crate::hittable::{
     aabb::Aabb,
+    box3d::Box3D,
     bvh::BvhNode,
     hittable_list::HittableList,
     sphere::{MovingSphere, Sphere},
-    rect::XyRect,
-    rect::XzRect,
-    rect::YzRect,
+    rotate::{RotateX, RotateY, RotateZ},
+    translate::Translate,
+    rect::{XyRect, XzRect, YzRect},
 };
 use crate::material::MaterialType;
 use crate::ray::Ray;
@@ -14,10 +15,13 @@ use enum_dispatch::enum_dispatch;
 use std::sync::Arc;
 
 pub mod aabb;
+pub mod box3d;
 pub mod bvh;
 pub mod hittable_list;
-pub mod sphere;
 pub mod rect;
+pub mod rotate;
+pub mod sphere;
+pub mod translate;
 
 pub struct HitRecord {
     pub point: Vec3,
@@ -38,9 +42,14 @@ pub trait Hittable {
 #[enum_dispatch(Hittable)]
 #[derive(Debug, Clone)]
 pub enum Hittables {
+    Box3D,
     BvhNode,
     MovingSphere,
+    RotateX,
+    RotateY,
+    RotateZ,
     Sphere,
+    Translate,
     HittableList,
     XyRect,
     XzRect,
