@@ -419,7 +419,7 @@ pub fn simple_light() -> HittableList {
     let sphere2 = Sphere::new(vec3(0.0, 2.0, 0.0), 2.0, texture.clone());
 
     let difflight = Diffuse::new(SolidColor::new(4.0, 4.0, 4.0));
-    let rect = XyRect::new(3.0, 5.0, 1.0, 3.0, -2.0, difflight.clone());
+    let rect = XyRect::new(5.0, 7.0, 1.0, 3.0, -2.0, difflight.clone());
     let sphere3 = Sphere::new(vec3(0.0, 7.0, 0.0), 2.0, difflight.clone());
     let mut world = HittableList {
         hittables: Vec::new(),

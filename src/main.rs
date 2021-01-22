@@ -84,14 +84,14 @@ fn main() -> Result<(), RecvError> {
     // World
     //let world = Hittables::from(BvhNode::new(random_world_earth(), time0, time1));
     // let world = Hittables::from(BvhNode::new(marble1(), time0, time1));
-    //let world = Hittables::from(BvhNode::new(simple_light(), time0, time1));
+    let world = Hittables::from(BvhNode::new(simple_light(), time0, time1));
     // let world = Hittables::from(BvhNode::new(rotate_test(), time0, time1));
-    let world = Hittables::from(BvhNode::new(cornell_box(), time0, time1));
+    // let world = Hittables::from(BvhNode::new(cornell_box(), time0, time1));
 
     // Camera
-    let camera = camera_cornell_box(time0, time1);
+    //let camera = camera_cornell_box(time0, time1);
     //let camera = camera_final(time0, time1);
-    //let camera = camera_light(time0, time1);
+    let camera = camera_light(time0, time1);
     let background = camera.background;
 
     // Parallelize
