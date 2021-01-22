@@ -11,9 +11,9 @@ pub struct Translate {
 
 impl Translate {
     pub fn new(object: Arc<Hittables>, offset: Vec3) -> Hittables {
-        Hittables::from(Translate{
+        Hittables::from(Translate {
             object: object,
-            offset: offset
+            offset: offset,
         })
     }
 }
@@ -23,7 +23,7 @@ impl Hittable for Translate {
         let moved = Ray {
             origin: ray.origin - self.offset,
             direction: ray.direction,
-            time: ray.time
+            time: ray.time,
         };
         match self.object.hit(&moved, t_min, t_max) {
             Some(hit) => {
@@ -37,17 +37,18 @@ impl Hittable for Translate {
                     front_face: front_face,
                     mat: hit.mat.clone(),
                 })
-            },
-            None => None
+            }
+            None => None,
         }
     }
 
     fn bounding_box(&self, time0: f64, time1: f64) -> Option<Aabb> {
         match self.object.bounding_box(time0, time1) {
-            Some(bbox) => {
-                Some(Aabb::new(bbox.minimum + self.offset, bbox.maximum + self.offset))
-            },
-            None => None
+            Some(bbox) => Some(Aabb::new(
+                bbox.minimum + self.offset,
+                bbox.maximum + self.offset,
+            )),
+            None => None,
         }
     }
 }

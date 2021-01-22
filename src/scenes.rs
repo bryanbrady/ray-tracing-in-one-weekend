@@ -444,11 +444,19 @@ pub fn cornell_box() -> HittableList {
     let wall4 = XzRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white.clone());
     let wall5 = XyRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white.clone());
 
-    let box1 = Box3D::new(vec3(0.0, 0.0, 0.0), vec3(165.0, 330.0, 165.0), white.clone());
+    let box1 = Box3D::new(
+        vec3(0.0, 0.0, 0.0),
+        vec3(165.0, 330.0, 165.0),
+        white.clone(),
+    );
     let box1 = RotateY::new(Arc::new(box1), 15.0);
     let box1 = Translate::new(Arc::new(box1), vec3(265.0, 0.0, 295.0));
 
-    let box2 = Box3D::new(vec3(0.0, 0.0, 0.0), vec3(165.0, 165.0, 165.0), white.clone());
+    let box2 = Box3D::new(
+        vec3(0.0, 0.0, 0.0),
+        vec3(165.0, 165.0, 165.0),
+        white.clone(),
+    );
     let box2 = RotateY::new(Arc::new(box2), -18.0);
     let box2 = Translate::new(Arc::new(box2), vec3(130.0, 0.0, 65.0));
 
@@ -482,9 +490,21 @@ pub fn rotate_test() -> HittableList {
     let wall4 = XzRect::new(0.0, 600.0, 0.0, 600.0, 600.0, white.clone());
     let wall5 = XyRect::new(0.0, 600.0, 0.0, 600.0, 600.0, white.clone());
 
-    let box1 = Box3D::new(vec3(0.0, 250.0,  0.0), vec3(100.0, 350.0, 100.0), white.clone());
-    let box2 = Box3D::new(vec3(0.0, 0.0, 250.0), vec3(100.0, 100.0, 350.0), green.clone());
-    let box3 = Box3D::new(vec3(250.0, 0.0, 0.0), vec3(350.0, 100.0, 100.0), green.clone());
+    let box1 = Box3D::new(
+        vec3(0.0, 250.0, 0.0),
+        vec3(100.0, 350.0, 100.0),
+        white.clone(),
+    );
+    let box2 = Box3D::new(
+        vec3(0.0, 0.0, 250.0),
+        vec3(100.0, 100.0, 350.0),
+        green.clone(),
+    );
+    let box3 = Box3D::new(
+        vec3(250.0, 0.0, 0.0),
+        vec3(350.0, 100.0, 100.0),
+        green.clone(),
+    );
     let box1 = RotateY::new(Arc::new(box1), 30.0);
     let box2 = RotateZ::new(Arc::new(box2), 30.0);
     let box3 = RotateX::new(Arc::new(box3), 30.0);

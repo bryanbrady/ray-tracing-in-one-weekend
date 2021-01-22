@@ -1,11 +1,15 @@
 use crate::hittable::{aabb::Aabb, HitRecord, Hittable, Hittables};
 use crate::ray::{face_normal, Ray};
-use crate::vec::vec3;
 use crate::util::degrees_to_radians;
+use crate::vec::vec3;
 use std::sync::Arc;
 
 #[derive(Debug, Clone)]
-pub enum Axis { X, Y, Z }
+pub enum Axis {
+    X,
+    Y,
+    Z,
+}
 
 #[derive(Debug, Clone)]
 pub struct Rotate {
@@ -17,26 +21,31 @@ pub struct Rotate {
 }
 
 #[derive(Debug, Clone)]
-pub struct RotateX { pub rotate: Rotate }
+pub struct RotateX {
+    pub rotate: Rotate,
+}
 
 #[derive(Debug, Clone)]
-pub struct RotateY { pub rotate: Rotate }
+pub struct RotateY {
+    pub rotate: Rotate,
+}
 
 #[derive(Debug, Clone)]
-pub struct RotateZ { pub rotate: Rotate }
-
+pub struct RotateZ {
+    pub rotate: Rotate,
+}
 
 impl Rotate {
     pub fn new(object: Arc<Hittables>, angle: f64, axis: Axis) -> Rotate {
         let radians = degrees_to_radians(angle);
         let sin_theta = f64::sin(radians);
         let cos_theta = f64::cos(radians);
-        let mut min = vec3(std::f64::INFINITY,
-                           std::f64::INFINITY,
-                           std::f64::INFINITY);
-        let mut max = vec3(-std::f64::INFINITY,
-                           -std::f64::INFINITY,
-                           -std::f64::INFINITY);
+        let mut min = vec3(std::f64::INFINITY, std::f64::INFINITY, std::f64::INFINITY);
+        let mut max = vec3(
+            -std::f64::INFINITY,
+            -std::f64::INFINITY,
+            -std::f64::INFINITY,
+        );
 
         let bbox = match object.bounding_box(0.0, 1.0) {
             None => None,
@@ -52,17 +61,17 @@ impl Rotate {
                                     let newy = cos_theta * y - sin_theta * z;
                                     let newz = sin_theta * y + cos_theta * z;
                                     vec3(x, newy, newz)
-                                },
+                                }
                                 Axis::Y => {
-                                    let newx =  cos_theta * x + sin_theta * z;
+                                    let newx = cos_theta * x + sin_theta * z;
                                     let newz = -sin_theta * x + cos_theta * z;
                                     vec3(newx, y, newz)
-                                },
+                                }
                                 Axis::Z => {
                                     let newx = cos_theta * x - sin_theta * y;
                                     let newy = sin_theta * x + cos_theta * y;
                                     vec3(newx, newy, z)
-                                },
+                                }
                             };
                             min.x = min.x.min(tester.x);
                             min.y = min.y.min(tester.y);
@@ -77,7 +86,7 @@ impl Rotate {
             }
         };
 
-        Rotate{
+        Rotate {
             object: object,
             sin_theta: sin_theta,
             cos_theta: cos_theta,
@@ -95,19 +104,19 @@ impl Rotate {
                 origin.z = -self.sin_theta * ray.origin.y + self.cos_theta * ray.origin.z;
                 direction.y = self.cos_theta * ray.direction.y + self.sin_theta * ray.direction.z;
                 direction.z = -self.sin_theta * ray.direction.y + self.cos_theta * ray.direction.z;
-            },
+            }
             Axis::Y => {
                 origin.x = self.cos_theta * ray.origin.x - self.sin_theta * ray.origin.z;
                 origin.z = self.sin_theta * ray.origin.x + self.cos_theta * ray.origin.z;
                 direction.x = self.cos_theta * ray.direction.x - self.sin_theta * ray.direction.z;
                 direction.z = self.sin_theta * ray.direction.x + self.cos_theta * ray.direction.z;
-            },
+            }
             Axis::Z => {
                 origin.x = self.cos_theta * ray.origin.x + self.sin_theta * ray.origin.y;
                 origin.y = -self.sin_theta * ray.origin.x + self.cos_theta * ray.origin.y;
                 direction.x = self.cos_theta * ray.direction.x + self.sin_theta * ray.direction.y;
                 direction.y = -self.sin_theta * ray.direction.x + self.cos_theta * ray.direction.y;
-            },
+            }
         }
 
         let rotated = Ray {
@@ -127,22 +136,22 @@ impl Rotate {
                         point.z = self.sin_theta * hit.point.y + self.cos_theta * hit.point.z;
                         normal.y = self.cos_theta * hit.normal.y - self.sin_theta * hit.normal.z;
                         normal.z = self.sin_theta * hit.normal.y + self.cos_theta * hit.normal.z;
-                    },
+                    }
                     Axis::Y => {
-                        point.x =  self.cos_theta * hit.point.x + self.sin_theta * hit.point.z;
+                        point.x = self.cos_theta * hit.point.x + self.sin_theta * hit.point.z;
                         point.z = -self.sin_theta * hit.point.x + self.cos_theta * hit.point.z;
-                        normal.x =  self.cos_theta * hit.normal.x + self.sin_theta * hit.normal.z;
+                        normal.x = self.cos_theta * hit.normal.x + self.sin_theta * hit.normal.z;
                         normal.z = -self.sin_theta * hit.normal.x + self.cos_theta * hit.normal.z;
-                    },
+                    }
                     Axis::Z => {
                         point.x = self.cos_theta * hit.point.x - self.sin_theta * hit.point.y;
                         point.y = self.sin_theta * hit.point.x + self.cos_theta * hit.point.y;
                         normal.x = self.cos_theta * hit.normal.x - self.sin_theta * hit.normal.y;
                         normal.y = self.sin_theta * hit.normal.x + self.cos_theta * hit.normal.y;
-                    },
+                    }
                 }
                 let (front_face, normal) = face_normal(&rotated, normal);
-                Some(HitRecord{
+                Some(HitRecord {
                     t: hit.t,
                     u: hit.u,
                     v: hit.v,
@@ -163,7 +172,7 @@ impl Rotate {
 impl RotateX {
     pub fn new(object: Arc<Hittables>, angle: f64) -> Hittables {
         Hittables::from(RotateX {
-            rotate: Rotate::new(object, angle, Axis::X)
+            rotate: Rotate::new(object, angle, Axis::X),
         })
     }
 }
@@ -171,7 +180,7 @@ impl RotateX {
 impl RotateY {
     pub fn new(object: Arc<Hittables>, angle: f64) -> Hittables {
         Hittables::from(RotateY {
-            rotate: Rotate::new(object, angle, Axis::Y)
+            rotate: Rotate::new(object, angle, Axis::Y),
         })
     }
 }
@@ -179,7 +188,7 @@ impl RotateY {
 impl RotateZ {
     pub fn new(object: Arc<Hittables>, angle: f64) -> Hittables {
         Hittables::from(RotateZ {
-            rotate: Rotate::new(object, angle, Axis::Z)
+            rotate: Rotate::new(object, angle, Axis::Z),
         })
     }
 }
@@ -194,7 +203,6 @@ impl Hittable for RotateX {
     }
 }
 
-
 impl Hittable for RotateY {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         self.rotate.hit(&ray, t_min, t_max)
@@ -205,7 +213,6 @@ impl Hittable for RotateY {
     }
 }
 
-
 impl Hittable for RotateZ {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         self.rotate.hit(&ray, t_min, t_max)
@@ -215,7 +222,6 @@ impl Hittable for RotateZ {
         self.rotate.bounding_box(_time0, _time1)
     }
 }
-
 
 // #[derive(Debug, Clone)]
 // pub struct RotateX {

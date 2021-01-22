@@ -1,12 +1,6 @@
 use crate::hittable::{
-    aabb::Aabb,
-    HitRecord,
-    Hittable,
-    Hittables,
-    hittable_list::HittableList,
-    rect::XyRect,
-    rect::XzRect,
-    rect::YzRect
+    aabb::Aabb, hittable_list::HittableList, rect::XyRect, rect::XzRect, rect::YzRect, HitRecord,
+    Hittable, Hittables,
 };
 use crate::material::MaterialType;
 use crate::ray::Ray;
@@ -32,7 +26,7 @@ impl Box3D {
         sides.add(XzRect::new(p0.x, p1.x, p0.z, p1.z, p0.y, mat.clone()));
         sides.add(YzRect::new(p0.y, p1.y, p0.z, p1.z, p1.x, mat.clone()));
         sides.add(YzRect::new(p0.y, p1.y, p0.z, p1.z, p0.x, mat.clone()));
-        Hittables::from(Box3D{
+        Hittables::from(Box3D {
             box_min: p0,
             box_max: p1,
             sides: sides,

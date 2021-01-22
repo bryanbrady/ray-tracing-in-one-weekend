@@ -3,10 +3,10 @@ use crate::hittable::{
     box3d::Box3D,
     bvh::BvhNode,
     hittable_list::HittableList,
-    sphere::{MovingSphere, Sphere},
-    rotate::{RotateX, RotateY, RotateZ},
-    translate::Translate,
     rect::{XyRect, XzRect, YzRect},
+    rotate::{RotateX, RotateY, RotateZ},
+    sphere::{MovingSphere, Sphere},
+    translate::Translate,
 };
 use crate::material::MaterialType;
 use crate::ray::Ray;
