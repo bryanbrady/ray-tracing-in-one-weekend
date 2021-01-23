@@ -14,6 +14,7 @@ mod vec;
 use indicatif::{ProgressBar, ProgressStyle};
 use rand::prelude::*;
 use rand::rngs::SmallRng;
+use rayon::prelude::*;
 use std::io::{self};
 use std::sync::mpsc::{channel, RecvError};
 use threadpool::ThreadPool;
@@ -77,7 +78,7 @@ fn main() -> Result<(), RecvError> {
     // PROFILER.lock().unwrap().start("./rt.profile").expect("Couldn't start");
 
     // Pixels
-    let mut pixels = vec![color(0.0, 0.0, 0.0); PIXELS as usize];
+    //let mut pixels = vec![color(0.0, 0.0, 0.0); PIXELS as usize];
 
     // Time
     let (time0, time1) = (0.0, 1.0);
@@ -99,17 +100,18 @@ fn main() -> Result<(), RecvError> {
     let background = camera.background;
 
     // Parallelize
-    let pool = ThreadPool::new(num_cpus::get() - 1);
-    let (tx, rx) = channel();
+    // let pool = ThreadPool::new(num_cpus::get() - 1);
+    // let (tx, rx) = channel();
 
     // Do it
     eprintln!("Tracing rays....");
-    for h in 0..IMAGE_HEIGHT {
-        let tx = tx.clone();
-        let myworld = world.clone();
-        pool.execute(move || {
-            for w in 0..IMAGE_WIDTH {
-                let mut rng = SmallRng::from_entropy();
+    let pixels: Vec<Color>  = (0..IMAGE_WIDTH * IMAGE_HEIGHT)
+        .into_par_iter()
+        .map_init(
+            SmallRng::from_entropy,
+            |rng, i| {
+                let w = i % IMAGE_WIDTH;
+                let h = IMAGE_HEIGHT - w - 1;
                 let mut pixel_color = Color {
                     r: 0.0,
                     g: 0.0,
@@ -120,24 +122,23 @@ fn main() -> Result<(), RecvError> {
                     let vr: f64 = rng.gen();
                     let u: f64 = ((w as f64) + ur) / ((IMAGE_WIDTH - 1) as f64);
                     let v: f64 = ((h as f64) + vr) / ((IMAGE_HEIGHT - 1) as f64);
-                    let r = camera.get_ray(u, v, &mut rng);
-                    pixel_color += ray_color(r, background, &myworld, MAX_DEPTH, &mut rng);
+                    let r = camera.get_ray(u, v, rng);
+                    pixel_color += ray_color(r, background, &world, MAX_DEPTH, rng);
                 }
-                tx.send((w, h, pixel_color)).expect("Could not send data!");
-            }
-        });
-    }
+                pixel_color
+            },
+        ).collect();
 
-    let n = (IMAGE_WIDTH * IMAGE_HEIGHT) as u64;
-    let bar = ProgressBar::new(n);
-    bar.set_style(ProgressStyle::default_bar()
-        .template("[{elapsed_precise}] {wide_bar} {pos:>7}/{len:7} {msg}"));
-    for _ in 0..(IMAGE_HEIGHT * IMAGE_WIDTH) {
-        let (w, h, pixel) = rx.recv()?;
-        pixels[((IMAGE_HEIGHT - h - 1) * IMAGE_WIDTH + w) as usize] = pixel;
-        bar.inc(1);
-    }
-    bar.finish();
+    // let n = (IMAGE_WIDTH * IMAGE_HEIGHT) as u64;
+    // let bar = ProgressBar::new(n);
+    // bar.set_style(ProgressStyle::default_bar()
+    //     .template("[{elapsed_precise}] {wide_bar} {pos:>7}/{len:7} {msg}"));
+    // for _ in 0..(IMAGE_HEIGHT * IMAGE_WIDTH) {
+    //     let (w, h, pixel) = rx.recv()?;
+    //     pixels[((IMAGE_HEIGHT - h - 1) * IMAGE_WIDTH + w) as usize] = pixel;
+    //     bar.inc(1);
+    // }
+    // bar.finish();
 
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
     for pixel in pixels {

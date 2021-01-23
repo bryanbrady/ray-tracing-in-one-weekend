@@ -14,6 +14,7 @@ enum_dispatch = "0.3.4"
 image = "0.23.12"
 cpuprofiler = "0.0.4"
 indicatif = "0.15.0"
+rayon = "1.5.0"
 
 [features]
 default = ["rand/small_rng"]
