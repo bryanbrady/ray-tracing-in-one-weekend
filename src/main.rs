@@ -22,7 +22,7 @@ use ray::Ray;
 #[allow(unused_imports)]
 use crate::scenes::{
     camera2, camera3, camera_blur, camera_cornell_box, camera_final, camera_light, camera_other,
-    cornell_box, earth, marble1, noise1, random_checkered_world, random_world, random_world2,
+    cornell_box, cornell_smoke, earth, marble1, noise1, random_checkered_world, random_world, random_world2,
     random_world_earth, random_world_original, rotate_test, simple_light, turbulence1, world1,
     world2,
 };
@@ -37,7 +37,7 @@ const ASPECT_RATIO: f64 = 16.0 / 9.0;
 const IMAGE_WIDTH: u32 = 800;
 const IMAGE_HEIGHT: u32 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u32;
 const PIXELS: u32 = IMAGE_WIDTH * IMAGE_HEIGHT;
-const SAMPLES_PER_PIXEL: u64 = 500;
+const SAMPLES_PER_PIXEL: u64 = 200;
 const MAX_DEPTH: u32 = 50;
 const GRID_SIZE: i32 = 11;
 
@@ -82,16 +82,17 @@ fn main() -> Result<(), RecvError> {
     let (time0, time1) = (0.0, 0.0);
 
     // World
-    //let world = Hittables::from(BvhNode::new(random_world_earth(), time0, time1));
+    // let world = Hittables::from(BvhNode::new(random_world_earth(), time0, time1));
     // let world = Hittables::from(BvhNode::new(marble1(), time0, time1));
-    let world = Hittables::from(BvhNode::new(simple_light(), time0, time1));
+    // let world = Hittables::from(BvhNode::new(simple_light(), time0, time1));
     // let world = Hittables::from(BvhNode::new(rotate_test(), time0, time1));
     // let world = Hittables::from(BvhNode::new(cornell_box(), time0, time1));
+    let world = Hittables::from(BvhNode::new(cornell_smoke(), time0, time1));
 
     // Camera
-    //let camera = camera_cornell_box(time0, time1);
-    //let camera = camera_final(time0, time1);
-    let camera = camera_light(time0, time1);
+    let camera = camera_cornell_box(time0, time1);
+    // let camera = camera_final(time0, time1);
+    // let camera = camera_light(time0, time1);
     let background = camera.background;
 
     // Parallelize
