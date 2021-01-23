@@ -2,6 +2,7 @@ use crate::hittable::{aabb::Aabb, HitRecord, Hittable, Hittables};
 use crate::ray::{face_normal, Ray};
 use crate::util::degrees_to_radians;
 use crate::vec::vec3;
+use rand::rngs::SmallRng;
 use std::sync::Arc;
 
 #[derive(Debug, Clone)]
@@ -95,7 +96,7 @@ impl Rotate {
         }
     }
 
-    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, rng: &mut SmallRng) -> Option<HitRecord> {
         let mut origin = ray.origin;
         let mut direction = ray.direction;
         match self.axis {
@@ -125,7 +126,7 @@ impl Rotate {
             time: ray.time,
         };
 
-        match self.object.hit(&rotated, t_min, t_max) {
+        match self.object.hit(&rotated, t_min, t_max, rng) {
             None => None,
             Some(hit) => {
                 let mut point = hit.point;
@@ -194,8 +195,8 @@ impl RotateZ {
 }
 
 impl Hittable for RotateX {
-    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
-        self.rotate.hit(&ray, t_min, t_max)
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, rng: &mut SmallRng) -> Option<HitRecord> {
+        self.rotate.hit(&ray, t_min, t_max, rng)
     }
 
     fn bounding_box(&self, _time0: f64, _time1: f64) -> Option<Aabb> {
@@ -204,8 +205,8 @@ impl Hittable for RotateX {
 }
 
 impl Hittable for RotateY {
-    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
-        self.rotate.hit(&ray, t_min, t_max)
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, rng: &mut SmallRng) -> Option<HitRecord> {
+        self.rotate.hit(&ray, t_min, t_max, rng)
     }
 
     fn bounding_box(&self, _time0: f64, _time1: f64) -> Option<Aabb> {
@@ -214,8 +215,8 @@ impl Hittable for RotateY {
 }
 
 impl Hittable for RotateZ {
-    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
-        self.rotate.hit(&ray, t_min, t_max)
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, rng: &mut SmallRng) -> Option<HitRecord> {
+        self.rotate.hit(&ray, t_min, t_max, rng)
     }
 
     fn bounding_box(&self, _time0: f64, _time1: f64) -> Option<Aabb> {

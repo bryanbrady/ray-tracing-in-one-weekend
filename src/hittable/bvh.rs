@@ -60,11 +60,11 @@ impl BvhNode {
 }
 
 impl Hittable for BvhNode {
-    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
-        match self.bbox.hit(ray, t_min, t_max) {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, rng: &mut SmallRng) -> Option<HitRecord> {
+        match self.bbox.hit(ray, t_min, t_max, rng) {
             Some(_) => {
-                let hit_left = self.left.hit(ray, t_min, t_max);
-                let hit_right = self.right.hit(ray, t_min, t_max);
+                let hit_left = self.left.hit(ray, t_min, t_max, rng);
+                let hit_right = self.right.hit(ray, t_min, t_max, rng);
                 match (hit_left, hit_right) {
                     (Some(hit_left), Some(hit_right)) => {
                         if hit_left.t < hit_right.t {

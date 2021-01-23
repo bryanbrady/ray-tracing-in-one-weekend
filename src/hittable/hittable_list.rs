@@ -1,5 +1,6 @@
 use crate::hittable::{aabb::Aabb, HitRecord, Hittable, Hittables};
 use crate::ray::Ray;
+use rand::rngs::SmallRng;
 
 #[derive(Debug, Clone)]
 pub struct HittableList {
@@ -26,11 +27,11 @@ impl HittableList {
 }
 
 impl Hittable for HittableList {
-    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, rng: &mut SmallRng) -> Option<HitRecord> {
         let mut ret: Option<HitRecord> = None;
         let mut closest = t_max;
         for hittable in self.hittables.iter() {
-            match hittable.hit(ray, t_min, closest) {
+            match hittable.hit(ray, t_min, closest, rng) {
                 Some(h) => {
                     closest = h.t;
                     ret = Some(h);

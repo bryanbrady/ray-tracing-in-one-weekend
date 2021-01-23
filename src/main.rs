@@ -52,7 +52,7 @@ fn ray_color(
     if depth <= 0 {
         return color(0.0, 0.0, 0.0);
     }
-    match world.hit(&ray, 0.0001, std::f64::MAX) {
+    match world.hit(&ray, 0.0001, std::f64::MAX, rng) {
         Some(hit) => {
             let emitted = hit.mat.emitted(hit.u, hit.v, hit.point);
             match hit.mat.scatter(&ray, &hit, rng) {

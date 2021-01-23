@@ -1,6 +1,7 @@
 use crate::hittable::{aabb::Aabb, HitRecord, Hittable, Hittables};
 use crate::ray::{face_normal, Ray};
 use crate::vec::Vec3;
+use rand::rngs::SmallRng;
 use std::sync::Arc;
 
 #[derive(Debug, Clone)]
@@ -19,13 +20,13 @@ impl Translate {
 }
 
 impl Hittable for Translate {
-    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, rng: &mut SmallRng) -> Option<HitRecord> {
         let moved = Ray {
             origin: ray.origin - self.offset,
             direction: ray.direction,
             time: ray.time,
         };
-        match self.object.hit(&moved, t_min, t_max) {
+        match self.object.hit(&moved, t_min, t_max, rng) {
             Some(hit) => {
                 let (front_face, normal) = face_normal(&moved, hit.normal);
                 Some(HitRecord {

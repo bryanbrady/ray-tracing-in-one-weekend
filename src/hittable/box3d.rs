@@ -5,6 +5,7 @@ use crate::hittable::{
 use crate::material::MaterialType;
 use crate::ray::Ray;
 use crate::vec::Vec3;
+use rand::rngs::SmallRng;
 use std::sync::Arc;
 
 #[derive(Debug, Clone)]
@@ -35,8 +36,8 @@ impl Box3D {
 }
 
 impl Hittable for Box3D {
-    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
-        self.sides.hit(ray, t_min, t_max)
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, rng: &mut SmallRng) -> Option<HitRecord> {
+        self.sides.hit(ray, t_min, t_max, rng)
     }
 
     fn bounding_box(&self, _time0: f64, _time1: f64) -> Option<Aabb> {

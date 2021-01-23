@@ -8,11 +8,13 @@ use rand::rngs::SmallRng;
 
 use crate::material::dielectric::Dielectric;
 use crate::material::diffuse::Diffuse;
+use crate::material::isotropic::Isotropic;
 use crate::material::lambertian::Lambertian;
 use crate::material::metal::Metal;
 
 pub mod dielectric;
 pub mod diffuse;
+pub mod isotropic;
 pub mod lambertian;
 pub mod metal;
 
@@ -31,6 +33,7 @@ pub trait Material: Clone {
 #[enum_dispatch(Material)]
 #[derive(Debug, Clone)]
 pub enum MaterialType {
+    Isotropic,
     Lambertian,
     Metal,
     Dielectric,

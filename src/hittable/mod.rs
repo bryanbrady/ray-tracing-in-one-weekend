@@ -2,6 +2,7 @@ use crate::hittable::{
     aabb::Aabb,
     box3d::Box3D,
     bvh::BvhNode,
+    constant_medium::ConstantMedium,
     hittable_list::HittableList,
     rect::{XyRect, XzRect, YzRect},
     rotate::{RotateX, RotateY, RotateZ},
@@ -12,11 +13,13 @@ use crate::material::MaterialType;
 use crate::ray::Ray;
 use crate::vec::Vec3;
 use enum_dispatch::enum_dispatch;
+use rand::rngs::SmallRng;
 use std::sync::Arc;
 
 pub mod aabb;
 pub mod box3d;
 pub mod bvh;
+pub mod constant_medium;
 pub mod hittable_list;
 pub mod rect;
 pub mod rotate;
@@ -35,7 +38,7 @@ pub struct HitRecord {
 
 #[enum_dispatch]
 pub trait Hittable {
-    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, rng: &mut SmallRng) -> Option<HitRecord>;
     fn bounding_box(&self, time0: f64, time1: f64) -> Option<Aabb>;
 }
 
@@ -44,6 +47,7 @@ pub trait Hittable {
 pub enum Hittables {
     Box3D,
     BvhNode,
+    ConstantMedium,
     MovingSphere,
     RotateX,
     RotateY,

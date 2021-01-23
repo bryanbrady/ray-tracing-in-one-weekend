@@ -2,6 +2,7 @@ use crate::hittable::{aabb::Aabb, HitRecord, Hittable, Hittables};
 use crate::material::MaterialType;
 use crate::ray::{face_normal, Ray};
 use crate::vec::{vec3, Vec3};
+use rand::rngs::SmallRng;
 use std::sync::Arc;
 
 #[derive(Debug, Clone)]
@@ -23,7 +24,7 @@ impl Sphere {
 }
 
 impl Hittable for Sphere {
-    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, _rng: &mut SmallRng) -> Option<HitRecord> {
         let oc = ray.origin - self.center;
         let a = ray.direction.length_squared();
         let half_b = oc.dot(ray.direction);
@@ -118,7 +119,7 @@ impl MovingSphere {
 }
 
 impl Hittable for MovingSphere {
-    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, _rng: &mut SmallRng) -> Option<HitRecord> {
         let oc = ray.origin - self.center(ray.time);
         let a = ray.direction.length_squared();
         let half_b = oc.dot(ray.direction);

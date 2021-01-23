@@ -2,6 +2,7 @@ use crate::hittable::{aabb::Aabb, HitRecord, Hittable, Hittables};
 use crate::material::MaterialType;
 use crate::ray::{face_normal, Ray};
 use crate::vec::vec3;
+use rand::rngs::SmallRng;
 use std::sync::Arc;
 
 #[derive(Debug, Clone)]
@@ -29,7 +30,7 @@ impl XyRect {
 }
 
 impl Hittable for XyRect {
-    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, _rng: &mut SmallRng) -> Option<HitRecord> {
         let t = (self.k - ray.origin.z) / ray.direction.z;
         if t < t_min || t > t_max {
             return None;
@@ -85,7 +86,7 @@ impl XzRect {
 }
 
 impl Hittable for XzRect {
-    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, _rng: &mut SmallRng) -> Option<HitRecord> {
         let t = (self.k - ray.origin.y) / ray.direction.y;
         if t < t_min || t > t_max {
             return None;
@@ -141,7 +142,7 @@ impl YzRect {
 }
 
 impl Hittable for YzRect {
-    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, _rng: &mut SmallRng) -> Option<HitRecord> {
         let t = (self.k - ray.origin.x) / ray.direction.x;
         if t < t_min || t > t_max {
             return None;
