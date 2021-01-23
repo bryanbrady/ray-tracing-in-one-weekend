@@ -9,15 +9,15 @@ mod util;
 mod vec;
 
 // extern crate cpuprofiler;
-// use cpuprofiler::PROFILER;
+#[cfg(feature = "profile")]
+use cpuprofiler::PROFILER;
 
-use indicatif::{ProgressBar, ProgressStyle};
+use indicatif::{ProgressBar, ProgressStyle, ParallelProgressIterator};
 use rand::prelude::*;
 use rand::rngs::SmallRng;
 use rayon::prelude::*;
+use rayon::iter::{ParallelIterator};
 use std::io::{self};
-use std::sync::mpsc::{channel, RecvError};
-use threadpool::ThreadPool;
 
 use color::{color, write_color, Color};
 use hittable::{bvh::BvhNode, Hittable, Hittables};
@@ -36,9 +36,9 @@ use crate::scenes::{
 // Image
 //const ASPECT_RATIO: f64 = 16.0 / 9.0;
 const ASPECT_RATIO: f64 = 1.0;
-const IMAGE_WIDTH: u32 = 400;
-const IMAGE_HEIGHT: u32 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u32;
-const PIXELS: u32 = IMAGE_WIDTH * IMAGE_HEIGHT;
+const IMAGE_WIDTH: u64 = 400;
+const IMAGE_HEIGHT: u64 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u64;
+const PIXELS: u64 = IMAGE_WIDTH * IMAGE_HEIGHT;
 const SAMPLES_PER_PIXEL: u64 = 100;
 const MAX_DEPTH: u32 = 50;
 const GRID_SIZE: i32 = 11;
@@ -74,11 +74,11 @@ fn ray_color(
     }
 }
 
-fn main() -> Result<(), RecvError> {
-    // PROFILER.lock().unwrap().start("./rt.profile").expect("Couldn't start");
-
-    // Pixels
-    //let mut pixels = vec![color(0.0, 0.0, 0.0); PIXELS as usize];
+fn main() -> Result<(), std::io::Error> {
+    #[cfg(feature = "profile")]
+    {
+        PROFILER.lock().unwrap().start("./rt.profile").expect("Couldn't start");
+    }
 
     // Time
     let (time0, time1) = (0.0, 1.0);
@@ -99,19 +99,21 @@ fn main() -> Result<(), RecvError> {
     let camera = camera_next_week_final(time0, time1);
     let background = camera.background;
 
-    // Parallelize
-    // let pool = ThreadPool::new(num_cpus::get() - 1);
-    // let (tx, rx) = channel();
+    // Progress Bar
+    let bar = ProgressBar::new(PIXELS);
+    bar.set_style(ProgressStyle::default_bar()
+        .template("[{elapsed_precise}] {wide_bar} {pos:>7}/{len:7} {msg}"));
 
     // Do it
     eprintln!("Tracing rays....");
-    let pixels: Vec<Color>  = (0..IMAGE_WIDTH * IMAGE_HEIGHT)
+    let pixels: Vec<Color>  = (0..PIXELS)
         .into_par_iter()
+        .progress_with(bar)
         .map_init(
             SmallRng::from_entropy,
             |rng, i| {
+                let h = IMAGE_HEIGHT - (i / IMAGE_WIDTH) - 1;
                 let w = i % IMAGE_WIDTH;
-                let h = IMAGE_HEIGHT - w - 1;
                 let mut pixel_color = Color {
                     r: 0.0,
                     g: 0.0,
@@ -129,23 +131,15 @@ fn main() -> Result<(), RecvError> {
             },
         ).collect();
 
-    // let n = (IMAGE_WIDTH * IMAGE_HEIGHT) as u64;
-    // let bar = ProgressBar::new(n);
-    // bar.set_style(ProgressStyle::default_bar()
-    //     .template("[{elapsed_precise}] {wide_bar} {pos:>7}/{len:7} {msg}"));
-    // for _ in 0..(IMAGE_HEIGHT * IMAGE_WIDTH) {
-    //     let (w, h, pixel) = rx.recv()?;
-    //     pixels[((IMAGE_HEIGHT - h - 1) * IMAGE_WIDTH + w) as usize] = pixel;
-    //     bar.inc(1);
-    // }
-    // bar.finish();
-
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
     for pixel in pixels {
         write_color(&mut io::stdout(), pixel, SAMPLES_PER_PIXEL).expect("Unable to write data");
     }
 
     eprintln!("Done!\n");
-    // PROFILER.lock().unwrap().stop().expect("Couldn't stop");
+    #[cfg(feature = "profile")]
+    {
+        PROFILER.lock().unwrap().stop().expect("Couldn't stop");
+    }
     Ok(())
 }
