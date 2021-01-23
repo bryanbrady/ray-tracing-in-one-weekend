@@ -8,11 +8,15 @@ mod texture;
 mod util;
 mod vec;
 
-use std::io::{self};
-use std::sync::mpsc::{channel, RecvError};
+// extern crate cpuprofiler;
+// use cpuprofiler::PROFILER;
 
+use indicatif::{ProgressBar, ProgressStyle};
 use rand::prelude::*;
 use rand::rngs::SmallRng;
+use std::io::{self};
+use std::sync::mpsc::{channel, RecvError};
+use threadpool::ThreadPool;
 
 use color::{color, write_color, Color};
 use hittable::{bvh::BvhNode, Hittable, Hittables};
@@ -27,10 +31,6 @@ use crate::scenes::{
     world2, next_week_final
 };
 
-extern crate threadpool;
-use threadpool::ThreadPool;
-extern crate cpuprofiler;
-use cpuprofiler::PROFILER;
 
 // Image
 //const ASPECT_RATIO: f64 = 16.0 / 9.0;
@@ -74,7 +74,7 @@ fn ray_color(
 }
 
 fn main() -> Result<(), RecvError> {
-    PROFILER.lock().unwrap().start("./rt.profile").expect("Couldn't start");
+    // PROFILER.lock().unwrap().start("./rt.profile").expect("Couldn't start");
 
     // Pixels
     let mut pixels = vec![color(0.0, 0.0, 0.0); PIXELS as usize];
@@ -128,10 +128,16 @@ fn main() -> Result<(), RecvError> {
         });
     }
 
+    let n = (IMAGE_WIDTH * IMAGE_HEIGHT) as u64;
+    let bar = ProgressBar::new(n);
+    bar.set_style(ProgressStyle::default_bar()
+        .template("[{elapsed_precise}] {wide_bar} {pos:>7}/{len:7} {msg}"));
     for _ in 0..(IMAGE_HEIGHT * IMAGE_WIDTH) {
         let (w, h, pixel) = rx.recv()?;
         pixels[((IMAGE_HEIGHT - h - 1) * IMAGE_WIDTH + w) as usize] = pixel;
+        bar.inc(1);
     }
+    bar.finish();
 
     println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
     for pixel in pixels {
@@ -139,6 +145,6 @@ fn main() -> Result<(), RecvError> {
     }
 
     eprintln!("Done!\n");
-    PROFILER.lock().unwrap().stop().expect("Couldn't stop");
+    // PROFILER.lock().unwrap().stop().expect("Couldn't stop");
     Ok(())
 }
