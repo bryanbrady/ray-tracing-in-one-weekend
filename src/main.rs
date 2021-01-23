@@ -8,7 +8,6 @@ mod texture;
 mod util;
 mod vec;
 
-// extern crate cpuprofiler;
 #[cfg(feature = "profile")]
 use cpuprofiler::PROFILER;
 
