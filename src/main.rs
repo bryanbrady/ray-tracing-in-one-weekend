@@ -1,13 +1,3 @@
-mod camera;
-mod color;
-mod hittable;
-mod material;
-mod ray;
-mod scenes;
-mod texture;
-mod util;
-mod vec;
-
 #[cfg(feature = "profile")]
 use cpuprofiler::PROFILER;
 
@@ -19,28 +9,44 @@ use rayon::iter::{ParallelIterator};
 use std::io::{self};
 
 use color::{color, write_color, Color};
-use hittable::{bvh::BvhNode, Hittable, Hittables};
+use hittable::{Hittable, Hittables};
 use material::Material;
 use ray::Ray;
 
 #[allow(unused_imports)]
 use crate::scenes::{
-    camera_next_week_final, camera2, camera3, camera_blur, camera_cornell_box, camera_final, camera_light, camera_other,
-    cornell_box, cornell_smoke, earth, marble1, noise1, random_checkered_world, random_world, random_world2,
-    random_world_earth, random_world_original, rotate_test, simple_light, turbulence1, world1,
-    world2, next_week_final
+    cornell_box::cornell_box,
+    cornell_smoke::cornell_smoke,
+    next_week_final::next_week_final,
+    perlin::noise,
+    perlin::marble,
+    perlin::turbulence,
+    random_world::random_world,
+    random_world::random_world_original,
+    random_world::random_world_checkered,
+    random_world::random_world_earth,
+    rotate_test::rotate_test,
+    simple_light::simple_light,
 };
 
+mod camera;
+mod color;
+mod hittable;
+mod material;
+mod ray;
+mod scenes;
+mod texture;
+mod util;
+mod vec;
 
 // Image
-//const ASPECT_RATIO: f64 = 16.0 / 9.0;
-const ASPECT_RATIO: f64 = 1.0;
-const IMAGE_WIDTH: u64 = 400;
+// const ASPECT_RATIO: f64 = 1.0;
+const ASPECT_RATIO: f64 = 16.0 / 9.0;
+const IMAGE_WIDTH: u64 = 1600;
 const IMAGE_HEIGHT: u64 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u64;
 const PIXELS: u64 = IMAGE_WIDTH * IMAGE_HEIGHT;
-const SAMPLES_PER_PIXEL: u64 = 100;
+const SAMPLES_PER_PIXEL: u64 = 10000;
 const MAX_DEPTH: u32 = 50;
-const GRID_SIZE: i32 = 11;
 
 #[allow(dead_code)]
 fn ray_color(
@@ -82,20 +88,15 @@ fn main() -> Result<(), std::io::Error> {
     // Time
     let (time0, time1) = (0.0, 1.0);
 
+    // Scene
+    //let scene = cornell_box(time0, time1, ASPECT_RATIO);
+    let scene = random_world_original(time0, time1, ASPECT_RATIO);
+
     // World
-    // let world = Hittables::from(BvhNode::new(random_world_earth(), time0, time1));
-    // let world = Hittables::from(BvhNode::new(marble1(), time0, time1));
-    // let world = Hittables::from(BvhNode::new(simple_light(), time0, time1));
-    // let world = Hittables::from(BvhNode::new(rotate_test(), time0, time1));
-    // let world = Hittables::from(BvhNode::new(cornell_box(), time0, time1));
-    // let world = Hittables::from(BvhNode::new(cornell_smoke(), time0, time1));
-    let world = Hittables::from(BvhNode::new(next_week_final(), time0, time1));
+    let world = scene.hittables;
 
     // Camera
-    // let camera = camera_cornell_box(time0, time1);
-    // let camera = camera_final(time0, time1);
-    // let camera = camera_light(time0, time1);
-    let camera = camera_next_week_final(time0, time1);
+    let camera = scene.camera;
     let background = camera.background;
 
     // Progress Bar
