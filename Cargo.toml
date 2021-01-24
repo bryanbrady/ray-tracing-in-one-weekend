@@ -19,3 +19,8 @@ rayon = "1.5.0"
 [features]
 default = ["rand/small_rng"]
 profile = ["cpuprofiler"]
+
+[[bin]]
+name = "pi"
+path = "src/bin/pi.rs"
+
