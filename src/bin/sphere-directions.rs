@@ -21,15 +21,3 @@ fn main() -> Result<(), std::io::Error> {
 
     Ok(())
 }
-
-// fn main() -> Result<(), std::io::Error> {
-//     println!("Integrating x^2");
-//     one()?;
-//     println!("Integrating x^2 with PDF");
-//     two()?;
-//     println!("Integrating x^2, v3");
-//     three()?;
-//     println!("Integrating x^2, v3");
-//     four()?;
-//     Ok(())
-// }
