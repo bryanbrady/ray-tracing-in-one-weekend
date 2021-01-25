@@ -24,3 +24,7 @@ profile = ["cpuprofiler"]
 name = "pi"
 path = "src/bin/pi.rs"
 
+[[bin]]
+name = "mc-integration"
+path = "src/bin/mc-integration.rs"
+
