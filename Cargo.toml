@@ -20,6 +20,10 @@ rayon = "1.5.0"
 default = ["rand/small_rng"]
 profile = ["cpuprofiler"]
 
+[lib]
+name = "rtlib"
+path = "src/lib.rs"
+
 [[bin]]
 name = "pi"
 path = "src/bin/pi.rs"
@@ -27,4 +31,8 @@ path = "src/bin/pi.rs"
 [[bin]]
 name = "mc-integration"
 path = "src/bin/mc-integration.rs"
+
+[[bin]]
+name = "sphere-directions"
+path = "src/bin/sphere-directions.rs"
 

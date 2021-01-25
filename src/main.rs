@@ -37,7 +37,7 @@ mod ray;
 mod scenes;
 mod texture;
 mod util;
-mod vec;
+pub mod vec;
 
 // Image
 // const ASPECT_RATIO: f64 = 1.0;
