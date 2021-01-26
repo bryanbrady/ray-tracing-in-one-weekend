@@ -1,3 +1,4 @@
+use crate::util::random_double;
 use rand::prelude::*;
 use rand::rngs::SmallRng;
 use std::ops;
@@ -114,6 +115,17 @@ impl Vec3 {
         } else {
             return -r;
         }
+    }
+
+
+    pub fn random_cosine_direction(rng: &mut SmallRng) -> Vec3 {
+        let r1 = random_double(rng);
+        let r2 = random_double(rng);
+        let phi = 2.0 * std::f64::consts::PI * r1;
+        let x = f64::cos(phi) * f64::sqrt(r2);
+        let y = f64::sin(phi) * f64::sqrt(r2);
+        let z = f64::sqrt(1.0 - r2);
+        vec3(x,y,z)
     }
 }
 
