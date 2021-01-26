@@ -47,7 +47,12 @@ impl Material for Dielectric {
                 time: ray.time,
             },
             attenuation: color(1.0, 1.0, 1.0),
+            pdf: 1.0,
         })
+    }
+
+    fn scattering_pdf(&self, _ray: &Ray, _hit: &HitRecord, _scattered: &Ray) -> f64 {
+        1.0
     }
 
     fn emitted(&self, _u: f64, _v: f64, _p: Vec3) -> Color {

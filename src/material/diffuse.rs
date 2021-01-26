@@ -24,6 +24,10 @@ impl Material for Diffuse {
         return None;
     }
 
+    fn scattering_pdf(&self, _ray: &Ray, _hit: &HitRecord, _scattered: &Ray) -> f64 {
+        1.0
+    }
+
     fn emitted(&self, u: f64, v: f64, p: Vec3) -> Color {
         return self.emit.value(u, v, p);
     }

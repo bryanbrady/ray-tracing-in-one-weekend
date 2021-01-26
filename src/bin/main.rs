@@ -33,10 +33,10 @@ use rtlib::scenes::{
 // Image
 const ASPECT_RATIO: f64 = 1.0;
 // const ASPECT_RATIO: f64 = 16.0 / 9.0;
-const IMAGE_WIDTH: u64 = 600;
+const IMAGE_WIDTH: u64 = 500;
 const IMAGE_HEIGHT: u64 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u64;
 const PIXELS: u64 = IMAGE_WIDTH * IMAGE_HEIGHT;
-const SAMPLES_PER_PIXEL: u64 = 200;
+const SAMPLES_PER_PIXEL: u64 = 100;
 const MAX_DEPTH: u32 = 50;
 
 #[allow(dead_code)]
@@ -73,6 +73,8 @@ fn ray_color(
 }
 
 fn main() -> Result<(), std::io::Error> {
+    rayon::ThreadPoolBuilder::new().num_threads(num_cpus::get()-1).build_global().unwrap();
+
     #[cfg(feature = "profile")]
     {
         PROFILER.lock().unwrap().start("./rt.profile").expect("Couldn't start");

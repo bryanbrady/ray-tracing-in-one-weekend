@@ -31,7 +31,12 @@ impl Material for Isotropic {
         Some(Scatter {
             scattered: scattered,
             attenuation: attenuation,
+            pdf: 1.0,
         })
+    }
+
+    fn scattering_pdf(&self, _ray: &Ray, _hit: &HitRecord, _scattered: &Ray) -> f64 {
+        1.0
     }
 
     fn emitted(&self, _u: f64, _v: f64, _p: Vec3) -> Color {

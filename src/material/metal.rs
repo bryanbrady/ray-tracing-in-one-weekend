@@ -36,9 +36,14 @@ impl Material for Metal {
             return Some(Scatter {
                 scattered: scattered,
                 attenuation: attenuation,
+                pdf: 1.0,
             });
         }
         return None;
+    }
+
+    fn scattering_pdf(&self, _ray: &Ray, _hit: &HitRecord, _scattered: &Ray) -> f64 {
+        1.0
     }
 
     fn emitted(&self, _u: f64, _v: f64, _p: Vec3) -> Color {

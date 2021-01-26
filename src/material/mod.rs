@@ -22,11 +22,13 @@ pub mod metal;
 pub struct Scatter {
     pub attenuation: Color,
     pub scattered: Ray,
+    pub pdf: f64,
 }
 
 #[enum_dispatch]
 pub trait Material: Clone {
     fn scatter(&self, ray: &Ray, hit: &HitRecord, rng: &mut SmallRng) -> Option<Scatter>;
+    fn scattering_pdf(&self, ray: &Ray, hit: &HitRecord, scattered: &Ray) -> f64;
     fn emitted(&self, _u: f64, _v: f64, _p: Vec3) -> Color;
 }
 
