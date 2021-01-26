@@ -3,6 +3,7 @@ name = "ray-tracing-in-one-weekend"
 version = "0.1.0"
 authors = ["Bryan Brady <bryan.brady@gmail.com>"]
 edition = "2018"
+default-run = "main"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -35,4 +36,16 @@ path = "src/bin/mc-integration.rs"
 [[bin]]
 name = "sphere-directions"
 path = "src/bin/sphere-directions.rs"
+
+[[bin]]
+name = "sphere-plot"
+path = "src/bin/sphere-plot.rs"
+
+[[bin]]
+name = "cos-cubed"
+path = "src/bin/cos-cubed.rs"
+
+[[bin]]
+name = "cos-density"
+path = "src/bin/cos-density.rs"
 

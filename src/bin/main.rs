@@ -8,14 +8,15 @@ use rayon::prelude::*;
 use rayon::iter::{ParallelIterator};
 use std::io::{self};
 
-use color::{color, write_color, Color};
-use hittable::{Hittable, Hittables};
-use material::Material;
-use ray::Ray;
+use rtlib::color::{color, write_color, Color};
+use rtlib::hittable::{Hittable, Hittables};
+use rtlib::material::Material;
+use rtlib::ray::Ray;
 
 #[allow(unused_imports)]
-use crate::scenes::{
+use rtlib::scenes::{
     cornell_box::cornell_box,
+    cornell_box::cornell_box_test,
     cornell_smoke::cornell_smoke,
     next_week_final::next_week_final,
     perlin::noise,
@@ -29,23 +30,13 @@ use crate::scenes::{
     simple_light::simple_light,
 };
 
-mod camera;
-mod color;
-mod hittable;
-mod material;
-mod ray;
-mod scenes;
-mod texture;
-mod util;
-pub mod vec;
-
 // Image
-// const ASPECT_RATIO: f64 = 1.0;
-const ASPECT_RATIO: f64 = 16.0 / 9.0;
-const IMAGE_WIDTH: u64 = 1600;
+const ASPECT_RATIO: f64 = 1.0;
+// const ASPECT_RATIO: f64 = 16.0 / 9.0;
+const IMAGE_WIDTH: u64 = 600;
 const IMAGE_HEIGHT: u64 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u64;
 const PIXELS: u64 = IMAGE_WIDTH * IMAGE_HEIGHT;
-const SAMPLES_PER_PIXEL: u64 = 10000;
+const SAMPLES_PER_PIXEL: u64 = 200;
 const MAX_DEPTH: u32 = 50;
 
 #[allow(dead_code)]
@@ -66,8 +57,10 @@ fn ray_color(
                 Some(scatter) => {
                     return emitted
                         + scatter.attenuation
-                            * ray_color(scatter.scattered, background, world, depth - 1, rng);
-                }
+                            * hit.mat.scattering_pdf(&ray, &hit, &scatter.scattered)
+                            * ray_color(scatter.scattered, background, world, depth - 1, rng)
+                            * (1.0 / scatter.pdf);
+                 }
                 None => {
                     return emitted;
                 }
@@ -90,7 +83,8 @@ fn main() -> Result<(), std::io::Error> {
 
     // Scene
     //let scene = cornell_box(time0, time1, ASPECT_RATIO);
-    let scene = random_world_original(time0, time1, ASPECT_RATIO);
+    let scene = cornell_box_test(time0, time1, ASPECT_RATIO);
+    //let scene = random_world_original(time0, time1, ASPECT_RATIO);
 
     // World
     let world = scene.hittables;
@@ -114,11 +108,7 @@ fn main() -> Result<(), std::io::Error> {
             |rng, i| {
                 let h = IMAGE_HEIGHT - (i / IMAGE_WIDTH) - 1;
                 let w = i % IMAGE_WIDTH;
-                let mut pixel_color = Color {
-                    r: 0.0,
-                    g: 0.0,
-                    b: 0.0,
-                };
+                let mut pixel_color = color(0.0, 0.0, 0.0);
                 for _i in 0..SAMPLES_PER_PIXEL {
                     let ur: f64 = rng.gen();
                     let vr: f64 = rng.gen();
