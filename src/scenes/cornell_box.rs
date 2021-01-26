@@ -88,7 +88,7 @@ pub fn cornell_box_test(t0: f64, t1: f64, aspect_ratio: f64) -> Scene {
         vup: vec3(0.0, 1.0, 0.0),
         vfov: 40.0,
         aspect_ratio: aspect_ratio,
-        aperture: 0.1,
+        aperture: 0.0,
         focus_dist: 10.0,
         time0: t0,
         time1: t1,
