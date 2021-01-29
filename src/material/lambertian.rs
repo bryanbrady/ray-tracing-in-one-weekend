@@ -45,7 +45,7 @@ impl Material for Lambertian {
         if cosine < 0.0 { 0.0 } else { cosine / std::f64::consts::PI }
     }
 
-    fn emitted(&self, _u: f64, _v: f64, _p: Vec3) -> Color {
+    fn emitted(&self, _ray: &Ray, _hit: &HitRecord, _u: f64, _v: f64, _p: Vec3) -> Color {
         return color(0.0, 0.0, 0.0);
     }
 }

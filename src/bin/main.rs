@@ -12,6 +12,7 @@ use rtlib::color::{color, write_color, Color};
 use rtlib::hittable::{Hittable, Hittables};
 use rtlib::material::Material;
 use rtlib::ray::Ray;
+use rtlib::vec::vec3;
 
 #[allow(unused_imports)]
 use rtlib::scenes::{
@@ -36,7 +37,7 @@ const ASPECT_RATIO: f64 = 1.0;
 const IMAGE_WIDTH: u64 = 500;
 const IMAGE_HEIGHT: u64 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u64;
 const PIXELS: u64 = IMAGE_WIDTH * IMAGE_HEIGHT;
-const SAMPLES_PER_PIXEL: u64 = 100;
+const SAMPLES_PER_PIXEL: u64 = 10;
 const MAX_DEPTH: u32 = 50;
 
 #[allow(dead_code)]
@@ -52,14 +53,32 @@ fn ray_color(
     }
     match world.hit(&ray, 0.0001, std::f64::MAX, rng) {
         Some(hit) => {
-            let emitted = hit.mat.emitted(hit.u, hit.v, hit.point);
+            let emitted = hit.mat.emitted(&ray, &hit, hit.u, hit.v, hit.point);
             match hit.mat.scatter(&ray, &hit, rng) {
                 Some(scatter) => {
+                    let on_light = vec3(rng.gen_range(213.0, 343.0), 554.0, rng.gen_range(227.0, 332.0));
+                    let to_light = on_light - hit.point;
+                    let distance_squared = to_light.length_squared();
+                    let to_light = to_light.unit_vector();
+                    if to_light.dot(hit.normal) < 0.0 {
+                        return emitted;
+                    }
+                    let light_area = ((343-213)*(332-227)) as f64;
+                    let light_cosine = to_light.y.abs();
+                    if light_cosine < 0.000001 {
+                        return emitted;
+                    }
+                    let pdf = distance_squared / (light_cosine * light_area);
+                    let scattered = Ray {
+                        origin: hit.point,
+                        direction: to_light,
+                        time: ray.time,
+                    };
                     return emitted
                         + scatter.attenuation
-                            * hit.mat.scattering_pdf(&ray, &hit, &scatter.scattered)
-                            * ray_color(scatter.scattered, background, world, depth - 1, rng)
-                            * (1.0 / scatter.pdf);
+                            * hit.mat.scattering_pdf(&ray, &hit, &scattered)
+                            * ray_color(scattered, background, world, depth - 1, rng)
+                            * (1.0 / pdf);
                  }
                 None => {
                     return emitted;
@@ -86,7 +105,7 @@ fn main() -> Result<(), std::io::Error> {
     // Scene
     //let scene = cornell_box(time0, time1, ASPECT_RATIO);
     let scene = cornell_box_test(time0, time1, ASPECT_RATIO);
-    //let scene = random_world_original(time0, time1, ASPECT_RATIO);
+    // let scene = random_world_original(time0, time1, ASPECT_RATIO);
 
     // World
     let world = scene.hittables;

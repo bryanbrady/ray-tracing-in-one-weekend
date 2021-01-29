@@ -3,6 +3,7 @@ use crate::hittable::{
     box3d::Box3D,
     bvh::BvhNode,
     constant_medium::ConstantMedium,
+    flip_face::FlipFace,
     hittable_list::HittableList,
     rect::{XyRect, XzRect, YzRect},
     rotate::{RotateX, RotateY, RotateZ},
@@ -20,6 +21,7 @@ pub mod aabb;
 pub mod box3d;
 pub mod bvh;
 pub mod constant_medium;
+pub mod flip_face;
 pub mod hittable_list;
 pub mod rect;
 pub mod rotate;
@@ -48,13 +50,14 @@ pub enum Hittables {
     Box3D,
     BvhNode,
     ConstantMedium,
+    FlipFace,
+    HittableList,
     MovingSphere,
     RotateX,
     RotateY,
     RotateZ,
     Sphere,
     Translate,
-    HittableList,
     XyRect,
     XzRect,
     YzRect,

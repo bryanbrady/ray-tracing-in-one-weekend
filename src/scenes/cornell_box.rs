@@ -3,6 +3,7 @@ use crate::color::color;
 use crate::hittable::{
     box3d::Box3D,
     bvh::BvhNode,
+    flip_face::FlipFace,
     hittable_list::HittableList,
     rect::{XyRect, XzRect, YzRect},
     rotate::RotateY,
@@ -122,7 +123,7 @@ pub fn cornell_box_test(t0: f64, t1: f64, aspect_ratio: f64) -> Scene {
     let box2 = RotateY::new(Arc::new(box2), -18.0);
     let box2 = Translate::new(Arc::new(box2), vec3(130.0, 0.0, 65.0));
 
-    let light = XzRect::new(213.0, 343.0, 227.0, 332.0, 554.0, light.clone());
+    let light = FlipFace::new(XzRect::new(213.0, 343.0, 227.0, 332.0, 554.0, light.clone()));
 
     let mut world = HittableList {
         hittables: Vec::new(),

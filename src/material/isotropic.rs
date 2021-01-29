@@ -39,7 +39,7 @@ impl Material for Isotropic {
         1.0
     }
 
-    fn emitted(&self, _u: f64, _v: f64, _p: Vec3) -> Color {
+    fn emitted(&self, _ray: &Ray, _hit: &HitRecord, _u: f64, _v: f64, _p: Vec3) -> Color {
         return color(0.0, 0.0, 0.0);
     }
 }

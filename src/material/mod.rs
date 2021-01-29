@@ -29,7 +29,7 @@ pub struct Scatter {
 pub trait Material: Clone {
     fn scatter(&self, ray: &Ray, hit: &HitRecord, rng: &mut SmallRng) -> Option<Scatter>;
     fn scattering_pdf(&self, ray: &Ray, hit: &HitRecord, scattered: &Ray) -> f64;
-    fn emitted(&self, _u: f64, _v: f64, _p: Vec3) -> Color;
+    fn emitted(&self, ray: &Ray, hit: &HitRecord, _u: f64, _v: f64, _p: Vec3) -> Color;
 }
 
 #[enum_dispatch(Material)]

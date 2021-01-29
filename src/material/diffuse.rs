@@ -1,4 +1,4 @@
-use crate::color::Color;
+use crate::color::{color, Color};
 use crate::hittable::HitRecord;
 use crate::material::{Material, MaterialType, Scatter};
 use crate::ray::Ray;
@@ -28,7 +28,11 @@ impl Material for Diffuse {
         1.0
     }
 
-    fn emitted(&self, u: f64, v: f64, p: Vec3) -> Color {
-        return self.emit.value(u, v, p);
+    fn emitted(&self, _ray: &Ray, hit: &HitRecord, u: f64, v: f64, p: Vec3) -> Color {
+        if hit.front_face {
+            return self.emit.value(u, v, p);
+        } else {
+            return color(0.0, 0.0, 0.0);
+        }
     }
 }
