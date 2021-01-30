@@ -7,12 +7,13 @@ use rand::rngs::SmallRng;
 use rayon::prelude::*;
 use rayon::iter::{ParallelIterator};
 use std::io::{self};
+use std::sync::Arc;
 
 use rtlib::color::{color, write_color, Color};
 use rtlib::hittable::{Hittable, Hittables};
-use rtlib::material::Material;
+use rtlib::material::{Material, MaterialType};
+use rtlib::pdf::{CosinePdf, HittablePdf, MixturePdf, Pdf};
 use rtlib::ray::Ray;
-use rtlib::vec::vec3;
 
 #[allow(unused_imports)]
 use rtlib::scenes::{
@@ -31,13 +32,15 @@ use rtlib::scenes::{
     simple_light::simple_light,
 };
 
+use rtlib::hittable::rect::XzRect;
+
 // Image
 const ASPECT_RATIO: f64 = 1.0;
 // const ASPECT_RATIO: f64 = 16.0 / 9.0;
-const IMAGE_WIDTH: u64 = 500;
+const IMAGE_WIDTH: u64 = 800;
 const IMAGE_HEIGHT: u64 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u64;
 const PIXELS: u64 = IMAGE_WIDTH * IMAGE_HEIGHT;
-const SAMPLES_PER_PIXEL: u64 = 10;
+const SAMPLES_PER_PIXEL: u64 = 1000;
 const MAX_DEPTH: u32 = 50;
 
 #[allow(dead_code)]
@@ -45,6 +48,7 @@ fn ray_color(
     ray: Ray,
     background: Color,
     world: &Hittables,
+    lights: Arc<Hittables>,
     depth: u32,
     rng: &mut SmallRng,
 ) -> Color {
@@ -56,29 +60,20 @@ fn ray_color(
             let emitted = hit.mat.emitted(&ray, &hit, hit.u, hit.v, hit.point);
             match hit.mat.scatter(&ray, &hit, rng) {
                 Some(scatter) => {
-                    let on_light = vec3(rng.gen_range(213.0, 343.0), 554.0, rng.gen_range(227.0, 332.0));
-                    let to_light = on_light - hit.point;
-                    let distance_squared = to_light.length_squared();
-                    let to_light = to_light.unit_vector();
-                    if to_light.dot(hit.normal) < 0.0 {
-                        return emitted;
-                    }
-                    let light_area = ((343-213)*(332-227)) as f64;
-                    let light_cosine = to_light.y.abs();
-                    if light_cosine < 0.000001 {
-                        return emitted;
-                    }
-                    let pdf = distance_squared / (light_cosine * light_area);
+                    let p0 = HittablePdf::new(hit.point, lights.clone());
+                    let p1 = CosinePdf::new(hit.normal);
+                    let pdf = MixturePdf::new(p0, p1);
                     let scattered = Ray {
                         origin: hit.point,
-                        direction: to_light,
+                        direction: pdf.generate(rng),
                         time: ray.time,
                     };
+                    let pdf_val = pdf.value(scattered.direction, rng);
                     return emitted
                         + scatter.attenuation
                             * hit.mat.scattering_pdf(&ray, &hit, &scattered)
-                            * ray_color(scattered, background, world, depth - 1, rng)
-                            * (1.0 / pdf);
+                            * ray_color(scattered, background, world, lights.clone(), depth - 1, rng)
+                            * (1.0 / pdf_val);
                  }
                 None => {
                     return emitted;
@@ -105,6 +100,7 @@ fn main() -> Result<(), std::io::Error> {
     // Scene
     //let scene = cornell_box(time0, time1, ASPECT_RATIO);
     let scene = cornell_box_test(time0, time1, ASPECT_RATIO);
+    let lights = Arc::new(XzRect::new(213.0, 343.0, 227.0, 332.0, 554.0, Arc::new(MaterialType::default())));
     // let scene = random_world_original(time0, time1, ASPECT_RATIO);
 
     // World
@@ -136,7 +132,7 @@ fn main() -> Result<(), std::io::Error> {
                     let u: f64 = ((w as f64) + ur) / ((IMAGE_WIDTH - 1) as f64);
                     let v: f64 = ((h as f64) + vr) / ((IMAGE_HEIGHT - 1) as f64);
                     let r = camera.get_ray(u, v, rng);
-                    pixel_color += ray_color(r, background, &world, MAX_DEPTH, rng);
+                    pixel_color += ray_color(r, background, &world, lights.clone(), MAX_DEPTH, rng);
                 }
                 pixel_color
             },
