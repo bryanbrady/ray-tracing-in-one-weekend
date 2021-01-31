@@ -95,6 +95,22 @@ impl Color {
 }
 
 pub fn write_color(_out: &mut impl Write, color: Color, samples_per_pixel: u64) -> io::Result<()> {
+    let r = if color.r.is_nan() || color.r.is_infinite() {
+        0.0
+    } else {
+        color.r
+    };
+    let g = if color.g.is_nan() || color.g.is_infinite() {
+        0.0
+    } else {
+        color.g
+    };
+    let b = if color.b.is_nan() || color.b.is_infinite() {
+        0.0
+    } else {
+        color.b
+    };
+    let color = Color { r: r, g: g, b: b };
     let scale = 1.0 / (samples_per_pixel as f64);
     let c = color * scale;
     let ir = (255.999 * clamp(f64::sqrt(c.r), 0.0, 0.999)) as u64;

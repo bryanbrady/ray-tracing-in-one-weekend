@@ -1,21 +1,11 @@
 use crate::camera::{Camera, CameraConfig};
 use crate::color::color;
 use crate::hittable::{
-    bvh::BvhNode,
-    hittable_list::HittableList,
-    rect::XyRect,
-    sphere::Sphere,
-    Hittables,
+    bvh::BvhNode, hittable_list::HittableList, rect::XyRect, sphere::Sphere, Hittables,
 };
-use crate::material::{
-    diffuse::Diffuse,
-    lambertian::Lambertian,
-};
-use crate::texture::{
-    marble::MarbleTexture,
-    solidcolor::SolidColor,
-};
+use crate::material::{diffuse::Diffuse, lambertian::Lambertian};
 use crate::scenes::Scene;
+use crate::texture::{marble::MarbleTexture, solidcolor::SolidColor};
 use crate::vec::vec3;
 
 #[allow(dead_code)]
@@ -48,6 +38,9 @@ pub fn simple_light(t0: f64, t1: f64, aspect_ratio: f64) -> Scene {
     world.add(rect);
     return Scene {
         camera: camera,
-        hittables: Hittables::from(BvhNode::new(world, t0, t1))
+        hittables: Hittables::from(BvhNode::new(world, t0, t1)),
+        lights: Hittables::from(HittableList {
+            hittables: Vec::new(),
+        }),
     };
 }

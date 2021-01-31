@@ -1,9 +1,9 @@
-use rtlib::util::random_double;
 use rand::prelude::*;
 use rand::rngs::SmallRng;
+use rtlib::util::random_double;
 
-const N : u64 = 1000000;
-const SEED : u64 = 0;
+const N: u64 = 1000000;
+const SEED: u64 = 0;
 
 fn main() -> Result<(), std::io::Error> {
     let mut rng = SmallRng::seed_from_u64(SEED);
@@ -14,7 +14,7 @@ fn main() -> Result<(), std::io::Error> {
         // let x = f64::cos(2.0 * std::f64::consts::PI * r1) * 2.0 * f64::sqrt(r2 * (1.0 - r2));
         // let y = f64::sin(2.0 * std::f64::consts::PI * r1) * 2.0 * f64::sqrt(r2 * (1.0 - r2));
         let z = 1.0 - r2;
-        sum += z*z*z / (1.0/(2.0*std::f64::consts::PI));
+        sum += z * z * z / (1.0 / (2.0 * std::f64::consts::PI));
     }
     println!("PI/2     = {}", std::f64::consts::PI / 2.0);
     println!("Estimate = {}", sum / (N as f64));

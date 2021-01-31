@@ -10,10 +10,7 @@ use crate::hittable::{
     translate::Translate,
     Hittables,
 };
-use crate::material::{
-    diffuse::Diffuse,
-    lambertian::Lambertian,
-};
+use crate::material::{diffuse::Diffuse, lambertian::Lambertian};
 use crate::scenes::Scene;
 use crate::texture::solidcolor::SolidColor;
 use crate::vec::vec3;
@@ -81,6 +78,9 @@ pub fn cornell_smoke(t0: f64, t1: f64, aspect_ratio: f64) -> Scene {
     world.add(light);
     return Scene {
         camera: camera,
-        hittables: Hittables::from(BvhNode::new(world, t0, t1))
+        hittables: Hittables::from(BvhNode::new(world, t0, t1)),
+        lights: Hittables::from(HittableList {
+            hittables: Vec::new(),
+        }),
     };
 }

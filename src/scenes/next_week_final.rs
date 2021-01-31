@@ -12,19 +12,12 @@ use crate::hittable::{
     Hittables,
 };
 use crate::material::{
-    dielectric::Dielectric,
-    diffuse::Diffuse,
-    lambertian::Lambertian,
-    metal::Metal,
+    dielectric::Dielectric, diffuse::Diffuse, lambertian::Lambertian, metal::Metal,
 };
 use crate::scenes::Scene;
-use crate::texture::{
-    image::ImageTexture,
-    noise::NoiseTexture,
-    solidcolor::SolidColor,
-};
-use crate::vec::{vec3, Vec3};
+use crate::texture::{image::ImageTexture, noise::NoiseTexture, solidcolor::SolidColor};
 use crate::util::random_double;
+use crate::vec::{vec3, Vec3};
 
 use rand::prelude::*;
 use rand::rngs::SmallRng;
@@ -32,7 +25,7 @@ use std::sync::Arc;
 
 #[allow(dead_code)]
 pub fn next_week_final(t0: f64, t1: f64, aspect_ratio: f64) -> Scene {
-    let lookfrom =  vec3(478.0, 278.0, -600.0);
+    let lookfrom = vec3(478.0, 278.0, -600.0);
     let lookat = vec3(278.0, 278.0, 0.0);
     let camera = Camera::new(CameraConfig {
         lookfrom: lookfrom,
@@ -61,7 +54,11 @@ pub fn next_week_final(t0: f64, t1: f64, aspect_ratio: f64) -> Scene {
             let x1 = x0 + w;
             let y1 = 100.0 * random_double(&mut rng);
             let z1 = z0 + w;
-            boxes1.add(Box3D::new(vec3(x0, y0, z0), vec3(x1, y1, z1), ground.clone()));
+            boxes1.add(Box3D::new(
+                vec3(x0, y0, z0),
+                vec3(x1, y1, z1),
+                ground.clone(),
+            ));
         }
     }
 
@@ -71,12 +68,26 @@ pub fn next_week_final(t0: f64, t1: f64, aspect_ratio: f64) -> Scene {
     world.add(Hittables::from(BvhNode::new(boxes1, 0.0, 1.0)));
 
     let light = Diffuse::new(SolidColor::new(7.0, 7.0, 7.0));
-    world.add(XzRect::new(123.0, 423.0, 147.0, 412.0, 554.0, light.clone()));
+    world.add(XzRect::new(
+        123.0,
+        423.0,
+        147.0,
+        412.0,
+        554.0,
+        light.clone(),
+    ));
 
     let center1 = vec3(400.0, 400.0, 200.0);
     let center2 = center1 + vec3(30.0, 0.0, 0.0);
     let moving_sphere_material = Lambertian::new(SolidColor::new(0.7, 0.3, 0.1));
-    let moving_sphere = MovingSphere::new(center1, center2, 0.0, 1.0, 50.0, moving_sphere_material.clone());
+    let moving_sphere = MovingSphere::new(
+        center1,
+        center2,
+        0.0,
+        1.0,
+        50.0,
+        moving_sphere_material.clone(),
+    );
     world.add(moving_sphere);
 
     let dielectric1 = Dielectric::new(1.5);
@@ -98,17 +109,25 @@ pub fn next_week_final(t0: f64, t1: f64, aspect_ratio: f64) -> Scene {
 
     let boundary1 = Sphere::new(vec3(360.0, 150.0, 145.0), 70.0, dielectric1.clone());
     world.add(boundary1.clone());
-    world.add(ConstantMedium::new(Arc::new(boundary1), 0.2, SolidColor::new(0.2, 0.4, 0.9)));
+    world.add(ConstantMedium::new(
+        Arc::new(boundary1),
+        0.2,
+        SolidColor::new(0.2, 0.4, 0.9),
+    ));
 
     let boundary2 = Sphere::new(Vec3::zero(), 5000.0, dielectric1.clone());
-    world.add(ConstantMedium::new(Arc::new(boundary2), 0.0001, SolidColor::new(1.0, 1.0, 1.0)));
+    world.add(ConstantMedium::new(
+        Arc::new(boundary2),
+        0.0001,
+        SolidColor::new(1.0, 1.0, 1.0),
+    ));
 
     let mut boxes2 = HittableList {
         hittables: Vec::new(),
     };
     let white = Lambertian::new(SolidColor::new(0.73, 0.73, 0.73));
     let ns = 1000;
-    for _ in 0..ns{
+    for _ in 0..ns {
         let sphere = Sphere::new(Vec3::random(0.0, 165.0, &mut rng), 10.0, white.clone());
         boxes2.add(sphere);
     }
@@ -120,6 +139,9 @@ pub fn next_week_final(t0: f64, t1: f64, aspect_ratio: f64) -> Scene {
 
     return Scene {
         camera: camera,
-        hittables: Hittables::from(BvhNode::new(world, t0, t1))
+        hittables: Hittables::from(BvhNode::new(world, t0, t1)),
+        lights: Hittables::from(HittableList {
+            hittables: Vec::new(),
+        }),
     };
 }

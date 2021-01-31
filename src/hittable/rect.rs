@@ -124,9 +124,11 @@ impl Hittable for XzRect {
             time: 0.0, // arbitrary
         };
         match self.hit(&ray, 0.001, std::f64::INFINITY, rng) {
-            None => { return 0.0; },
+            None => {
+                return 0.0;
+            }
             Some(hit) => {
-                let area = (self.x1-self.x0) * (self.z1-self.z0);
+                let area = (self.x1 - self.x0) * (self.z1 - self.z0);
                 let distance_squared = hit.t * hit.t * v.length_squared();
                 let cosine = f64::abs(v.dot(hit.normal) / v.length());
                 return distance_squared / (cosine * area);

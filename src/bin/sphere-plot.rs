@@ -1,9 +1,9 @@
-use rtlib::util::random_double;
 use rand::prelude::*;
 use rand::rngs::SmallRng;
+use rtlib::util::random_double;
 
-const N : u64 = 200;
-const SEED : u64 = 0;
+const N: u64 = 200;
+const SEED: u64 = 0;
 
 fn main() -> Result<(), std::io::Error> {
     let mut rng = SmallRng::seed_from_u64(SEED);

@@ -6,17 +6,9 @@ use crate::hittable::{
     sphere::{MovingSphere, Sphere},
     Hittables,
 };
-use crate::material::{
-    dielectric::Dielectric,
-    lambertian::Lambertian,
-    metal::Metal,
-};
+use crate::material::{dielectric::Dielectric, lambertian::Lambertian, metal::Metal};
 use crate::scenes::Scene;
-use crate::texture::{
-    checker::CheckerTexture,
-    image::ImageTexture,
-    solidcolor::SolidColor,
-};
+use crate::texture::{checker::CheckerTexture, image::ImageTexture, solidcolor::SolidColor};
 use crate::vec::{vec3, Vec3};
 
 use rand::prelude::*;
@@ -89,7 +81,10 @@ pub fn random_world_original(t0: f64, t1: f64, aspect_ratio: f64) -> Scene {
     world.add(Sphere::new(vec3(4.0, 1.0, 0.0), 1.0, mat3));
     return Scene {
         camera: camera,
-        hittables: Hittables::from(BvhNode::new(world, t0, t1))
+        hittables: Hittables::from(BvhNode::new(world, t0, t1)),
+        lights: Hittables::from(HittableList {
+            hittables: Vec::new(),
+        }),
     };
 }
 
@@ -161,7 +156,10 @@ pub fn random_world_checkered(t0: f64, t1: f64, aspect_ratio: f64) -> Scene {
     world.add(Sphere::new(vec3(0.0, 1.0, 0.0), 1.0, Dielectric::new(1.5)));
     return Scene {
         camera: camera,
-        hittables: Hittables::from(BvhNode::new(world, t0, t1))
+        hittables: Hittables::from(BvhNode::new(world, t0, t1)),
+        lights: Hittables::from(HittableList {
+            hittables: Vec::new(),
+        }),
     };
 }
 
@@ -233,7 +231,10 @@ pub fn random_world(t0: f64, t1: f64, aspect_ratio: f64) -> Scene {
     world.add(Sphere::new(vec3(0.0, 1.0, 0.0), 1.0, Dielectric::new(1.5)));
     return Scene {
         camera: camera,
-        hittables: Hittables::from(BvhNode::new(world, t0, t1))
+        hittables: Hittables::from(BvhNode::new(world, t0, t1)),
+        lights: Hittables::from(HittableList {
+            hittables: Vec::new(),
+        }),
     };
 }
 
@@ -316,7 +317,9 @@ pub fn random_world_earth(t0: f64, t1: f64, aspect_ratio: f64) -> Scene {
     world.add(Sphere::new(vec3(0.0, 1.0, 0.0), 1.0, mat1.clone()));
     return Scene {
         camera: camera,
-        hittables: Hittables::from(BvhNode::new(world, t0, t1))
+        hittables: Hittables::from(BvhNode::new(world, t0, t1)),
+        lights: Hittables::from(HittableList {
+            hittables: Vec::new(),
+        }),
     };
 }
-

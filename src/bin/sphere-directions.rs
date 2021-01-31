@@ -1,13 +1,13 @@
-use rtlib::vec::Vec3;
 use rand::prelude::*;
 use rand::rngs::SmallRng;
+use rtlib::vec::Vec3;
 
 fn pdf(_p: Vec3) -> f64 {
     1.0 / (4.0 * std::f64::consts::PI)
 }
 
-const N : u64 = 1000000;
-const SEED : u64 = 0;
+const N: u64 = 1000000;
+const SEED: u64 = 0;
 
 fn main() -> Result<(), std::io::Error> {
     let mut rng = SmallRng::seed_from_u64(SEED);

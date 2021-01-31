@@ -12,14 +12,14 @@ fn pdf3(x: f64) -> f64 {
     3.0 * x * x / 8.0
 }
 
-const N : u64 = 1000000;
+const N: u64 = 1000000;
 
 fn one() -> Result<(), std::io::Error> {
     let mut rng = rand::thread_rng();
     let mut sum = 0.0;
     for _ in 0..N {
         let x = rng.gen_range(0.0, 2.0);
-        sum += x*x;
+        sum += x * x;
     }
     println!("I = {:.12} ({} iterations)", 2.0 * sum / (N as f64), N);
 
@@ -31,7 +31,7 @@ fn two() -> Result<(), std::io::Error> {
     let mut sum = 0.0;
     for _ in 0..N {
         let x = f64::sqrt(rng.gen_range(0.0, 4.0));
-        sum += x*x / pdf1(x);
+        sum += x * x / pdf1(x);
     }
     println!("I = {:.12} ({} iterations)", sum / (N as f64), N);
 
@@ -43,7 +43,7 @@ fn three() -> Result<(), std::io::Error> {
     let mut sum = 0.0;
     for _ in 0..N {
         let x = rng.gen_range(0.0, 2.0);
-        sum += x*x / pdf2(x);
+        sum += x * x / pdf2(x);
     }
     println!("I = {:.12} ({} iterations)", sum / (N as f64), N);
 
@@ -54,8 +54,8 @@ fn four() -> Result<(), std::io::Error> {
     let mut rng = rand::thread_rng();
     let mut sum = 0.0;
     for _ in 0..N {
-        let x = f64::powf(rng.gen_range(0.0, 2.0), 1.0/3.0);
-        sum += x*x / pdf3(x);
+        let x = f64::powf(rng.gen_range(0.0, 2.0), 1.0 / 3.0);
+        sum += x * x / pdf3(x);
     }
     println!("I = {:.12} ({} iterations)", sum / (N as f64), N);
 

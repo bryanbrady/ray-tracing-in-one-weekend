@@ -8,10 +8,7 @@ use crate::hittable::{
     rotate::{RotateX, RotateY, RotateZ},
     Hittables,
 };
-use crate::material::{
-    diffuse::Diffuse,
-    lambertian::Lambertian,
-};
+use crate::material::{diffuse::Diffuse, lambertian::Lambertian};
 use crate::scenes::Scene;
 use crate::texture::solidcolor::SolidColor;
 use crate::vec::vec3;
@@ -79,6 +76,9 @@ pub fn rotate_test(t0: f64, t1: f64, aspect_ratio: f64) -> Scene {
     world.add(light);
     return Scene {
         camera: camera,
-        hittables: Hittables::from(BvhNode::new(world, t0, t1))
+        hittables: Hittables::from(BvhNode::new(world, t0, t1)),
+        lights: Hittables::from(HittableList {
+            hittables: Vec::new(),
+        }),
     };
 }

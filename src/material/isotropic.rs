@@ -30,7 +30,7 @@ impl Material for Isotropic {
         Some(Scatter {
             ray: ray,
             attenuation: attenuation,
-            pdf: None
+            pdf: None,
         })
     }
 }

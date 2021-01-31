@@ -2,8 +2,8 @@ use crate::hittable::{aabb::Aabb, HitRecord, Hittable, Hittables};
 use crate::material::MaterialType;
 use crate::onb::Onb;
 use crate::ray::{face_normal, Ray};
-use crate::vec::{vec3, Vec3};
 use crate::util::random_to_sphere;
+use crate::vec::{vec3, Vec3};
 use rand::rngs::SmallRng;
 use std::sync::Arc;
 
@@ -91,9 +91,13 @@ impl Hittable for Sphere {
         };
         let hit = self.hit(&ray, 0.001, std::f64::INFINITY, rng);
         match hit {
-            None => { return 0.0; },
+            None => {
+                return 0.0;
+            }
             Some(_) => {
-                let cos_theta_max = f64::sqrt(1.0 * self.radius*self.radius/(self.center-origin).length_squared());
+                let cos_theta_max = f64::sqrt(
+                    1.0 * self.radius * self.radius / (self.center - origin).length_squared(),
+                );
                 let solid_angle = 2.0 * std::f64::consts::PI * (1.0 - cos_theta_max);
                 return 1.0 / solid_angle;
             }

@@ -35,7 +35,7 @@ impl Material for Metal {
             return Some(Scatter {
                 ray: scattered,
                 attenuation: attenuation,
-                pdf: None
+                pdf: None,
             });
         }
         return None;

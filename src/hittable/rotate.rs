@@ -52,7 +52,7 @@ impl RotateX {
                             let z = k * bbox.maximum.z + (1.0 - k) * bbox.minimum.z;
                             let newy = cos_theta * y - sin_theta * z;
                             let newz = sin_theta * y + cos_theta * z;
-                            let tester =vec3(x, newy, newz);
+                            let tester = vec3(x, newy, newz);
                             min.x = min.x.min(tester.x);
                             min.y = min.y.min(tester.y);
                             min.z = min.z.min(tester.z);

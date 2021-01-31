@@ -1,7 +1,7 @@
-use crate::hittable::{Hittable,Hittables};
+use crate::hittable::{Hittable, Hittables};
 use crate::onb::Onb;
-use crate::vec::Vec3;
 use crate::util::random_double;
+use crate::vec::Vec3;
 
 use enum_dispatch::enum_dispatch;
 use rand::rngs::SmallRng;
@@ -9,16 +9,19 @@ use std::sync::Arc;
 
 #[enum_dispatch]
 pub trait Pdf {
-    fn value(&self, _direction: Vec3, _rng: &mut SmallRng) -> f64 { 0.0 }
-    fn generate(&self, _rng: &mut SmallRng) -> Vec3 { Vec3::zero() }
+    fn value(&self, _direction: Vec3, _rng: &mut SmallRng) -> f64 {
+        0.0
+    }
+    fn generate(&self, _rng: &mut SmallRng) -> Vec3 {
+        Vec3::zero()
+    }
 }
-
 
 #[enum_dispatch(Pdf)]
 pub enum PdfType {
     CosinePdf,
     HittablePdf,
-    MixturePdf
+    MixturePdf,
 }
 
 pub struct CosinePdf {
@@ -34,7 +37,11 @@ impl CosinePdf {
 impl Pdf for CosinePdf {
     fn value(&self, direction: Vec3, _rng: &mut SmallRng) -> f64 {
         let cosine = direction.unit_vector().dot(self.uvw.w());
-        if cosine <= 0.0 { 0.0 } else { cosine / std::f64::consts::PI }
+        if cosine <= 0.0 {
+            0.0
+        } else {
+            cosine / std::f64::consts::PI
+        }
     }
 
     fn generate(&self, rng: &mut SmallRng) -> Vec3 {
@@ -48,7 +55,7 @@ pub struct HittablePdf {
 }
 
 impl HittablePdf {
-    pub fn new(origin: Vec3, object: Arc<Hittables>) -> PdfType{
+    pub fn new(origin: Vec3, object: Arc<Hittables>) -> PdfType {
         PdfType::from(HittablePdf {
             origin: origin,
             object: object,
@@ -86,7 +93,11 @@ impl Pdf for MixturePdf {
     }
 
     fn generate(&self, rng: &mut SmallRng) -> Vec3 {
-        if random_double(rng) < 0.5 { self.pdf1.generate(rng) } else { self.pdf2.generate(rng) }
+        if random_double(rng) < 0.5 {
+            self.pdf1.generate(rng)
+        } else {
+            self.pdf2.generate(rng)
+        }
     }
 }
 

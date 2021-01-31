@@ -12,13 +12,11 @@ use crate::hittable::{
     Hittables,
 };
 use crate::material::{
-    diffuse::Diffuse,
-    dielectric::Dielectric,
-    lambertian::Lambertian,
+    dielectric::Dielectric, diffuse::Diffuse, lambertian::Lambertian, MaterialType,
 };
 use crate::scenes::Scene;
 use crate::texture::solidcolor::SolidColor;
-use crate::vec::vec3;
+use crate::vec::{vec3, Vec3};
 
 use std::sync::Arc;
 
@@ -79,12 +77,15 @@ pub fn cornell_box(t0: f64, t1: f64, aspect_ratio: f64) -> Scene {
     world.add(light);
     return Scene {
         camera: camera,
-        hittables: Hittables::from(BvhNode::new(world, t0, t1))
+        hittables: Hittables::from(BvhNode::new(world, t0, t1)),
+        lights: Hittables::from(HittableList {
+            hittables: Vec::new(),
+        }),
     };
 }
 
 #[allow(dead_code)]
-pub fn cornell_box_test(t0: f64, t1: f64, aspect_ratio: f64) -> Scene {
+pub fn cornell_box_sphere(t0: f64, t1: f64, aspect_ratio: f64) -> Scene {
     let camera = Camera::new(CameraConfig {
         lookfrom: vec3(278.0, 278.0, -800.0),
         lookat: vec3(278.0, 278.0, 0.0),
@@ -120,7 +121,14 @@ pub fn cornell_box_test(t0: f64, t1: f64, aspect_ratio: f64) -> Scene {
     let glass = Dielectric::new(1.5);
     let sphere = Sphere::new(vec3(190.0, 90.0, 190.0), 90.0, glass.clone());
 
-    let light = FlipFace::new(XzRect::new(213.0, 343.0, 227.0, 332.0, 554.0, light.clone()));
+    let light = FlipFace::new(XzRect::new(
+        213.0,
+        343.0,
+        227.0,
+        332.0,
+        554.0,
+        light.clone(),
+    ));
 
     let mut world = HittableList {
         hittables: Vec::new(),
@@ -133,8 +141,26 @@ pub fn cornell_box_test(t0: f64, t1: f64, aspect_ratio: f64) -> Scene {
     world.add(box1);
     world.add(sphere);
     world.add(light);
+
+    let mut lights = HittableList {
+        hittables: Vec::new(),
+    };
+    lights.add(XzRect::new(
+        213.0,
+        343.0,
+        227.0,
+        332.0,
+        554.0,
+        Arc::new(MaterialType::default()),
+    ));
+    lights.add(Sphere::new(
+        Vec3::new(190.0, 90.0, 190.0),
+        90.0,
+        Arc::new(MaterialType::default()),
+    ));
     return Scene {
         camera: camera,
-        hittables: Hittables::from(BvhNode::new(world, t0, t1))
+        hittables: Hittables::from(BvhNode::new(world, t0, t1)),
+        lights: Hittables::from(lights),
     };
 }

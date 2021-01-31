@@ -1,18 +1,9 @@
 use crate::camera::{Camera, CameraConfig};
 use crate::color::color;
-use crate::hittable::{
-    bvh::BvhNode,
-    hittable_list::HittableList,
-    sphere::Sphere,
-    Hittables,
-};
+use crate::hittable::{bvh::BvhNode, hittable_list::HittableList, sphere::Sphere, Hittables};
 use crate::material::lambertian::Lambertian;
 use crate::scenes::Scene;
-use crate::texture::{
-    marble::MarbleTexture,
-    noise::NoiseTexture,
-    turbulence::TurbulenceTexture,
-};
+use crate::texture::{marble::MarbleTexture, noise::NoiseTexture, turbulence::TurbulenceTexture};
 use crate::vec::vec3;
 
 #[allow(dead_code)]
@@ -39,7 +30,10 @@ pub fn noise(t0: f64, t1: f64, aspect_ratio: f64) -> Scene {
     world.add(sphere2);
     return Scene {
         camera: camera,
-        hittables: Hittables::from(BvhNode::new(world, t0, t1))
+        hittables: Hittables::from(BvhNode::new(world, t0, t1)),
+        lights: Hittables::from(HittableList {
+            hittables: Vec::new(),
+        }),
     };
 }
 
@@ -67,7 +61,10 @@ pub fn turbulence(t0: f64, t1: f64, aspect_ratio: f64) -> Scene {
     world.add(sphere2);
     return Scene {
         camera: camera,
-        hittables: Hittables::from(BvhNode::new(world, t0, t1))
+        hittables: Hittables::from(BvhNode::new(world, t0, t1)),
+        lights: Hittables::from(HittableList {
+            hittables: Vec::new(),
+        }),
     };
 }
 
@@ -95,6 +92,9 @@ pub fn marble(t0: f64, t1: f64, aspect_ratio: f64) -> Scene {
     world.add(sphere2);
     return Scene {
         camera: camera,
-        hittables: Hittables::from(BvhNode::new(world, t0, t1))
+        hittables: Hittables::from(BvhNode::new(world, t0, t1)),
+        lights: Hittables::from(HittableList {
+            hittables: Vec::new(),
+        }),
     };
 }

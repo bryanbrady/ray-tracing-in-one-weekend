@@ -13,4 +13,5 @@ pub mod simple_light;
 pub struct Scene {
     pub camera: Camera,
     pub hittables: Hittables,
+    pub lights: Hittables,
 }

@@ -47,7 +47,7 @@ impl Material for Dielectric {
                 time: rayin.time,
             },
             attenuation: color(1.0, 1.0, 1.0),
-            pdf: None
+            pdf: None,
         })
     }
 }

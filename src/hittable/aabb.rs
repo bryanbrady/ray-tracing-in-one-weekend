@@ -45,7 +45,13 @@ impl Default for Aabb {
 }
 
 impl Aabb {
-    pub fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, _rng: &mut SmallRng) -> Option<(f64, f64)> {
+    pub fn hit(
+        &self,
+        ray: &Ray,
+        t_min: f64,
+        t_max: f64,
+        _rng: &mut SmallRng,
+    ) -> Option<(f64, f64)> {
         // x
         let inv_d = 1.0 / ray.direction.x;
         let t0 = (self.minimum.x - ray.origin.x) * inv_d;
