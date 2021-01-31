@@ -53,14 +53,7 @@ fn ray_color(
                     let pdf = scatter.pdf;
                     if pdf.is_none() || lights.length() == 0 {
                         return scatter.attenuation
-                            * ray_color(
-                                scatter.ray,
-                                background,
-                                world,
-                                lights.clone(),
-                                depth - 1,
-                                rng,
-                            );
+                            * ray_color(scatter.ray, background, world, lights.clone(), depth - 1, rng);
                     } else {
                         let pdf = pdf.unwrap();
                         let light_pdf = HittablePdf::new(hit.point, lights.clone());
@@ -74,14 +67,7 @@ fn ray_color(
                         return emitted
                             + scatter.attenuation
                                 * hit.mat.scattering_pdf(&ray, &hit, &scattered)
-                                * ray_color(
-                                    scattered,
-                                    background,
-                                    world,
-                                    lights.clone(),
-                                    depth - 1,
-                                    rng,
-                                )
+                                * ray_color(scattered, background, world, lights.clone(), depth - 1, rng)
                                 * (1.0 / pdf_val);
                     }
                 }
