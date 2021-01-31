@@ -1,4 +1,3 @@
-use crate::color::{color, Color};
 use crate::hittable::HitRecord;
 use crate::material::{Material, MaterialType, Scatter};
 use crate::ray::Ray;
@@ -34,19 +33,11 @@ impl Material for Metal {
         let attenuation = self.albedo.value(hit.u, hit.v, hit.point);
         if scattered.direction.dot(hit.normal) > 0.0 {
             return Some(Scatter {
-                scattered: scattered,
+                ray: scattered,
                 attenuation: attenuation,
-                pdf: 1.0,
+                pdf: None
             });
         }
         return None;
-    }
-
-    fn scattering_pdf(&self, _ray: &Ray, _hit: &HitRecord, _scattered: &Ray) -> f64 {
-        1.0
-    }
-
-    fn emitted(&self, _ray: &Ray, _hit: &HitRecord, _u: f64, _v: f64, _p: Vec3) -> Color {
-        return color(0.0, 0.0, 0.0);
     }
 }

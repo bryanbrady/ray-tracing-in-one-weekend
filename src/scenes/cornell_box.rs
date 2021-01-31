@@ -7,11 +7,13 @@ use crate::hittable::{
     hittable_list::HittableList,
     rect::{XyRect, XzRect, YzRect},
     rotate::RotateY,
+    sphere::Sphere,
     translate::Translate,
     Hittables,
 };
 use crate::material::{
     diffuse::Diffuse,
+    dielectric::Dielectric,
     lambertian::Lambertian,
 };
 use crate::scenes::Scene;
@@ -115,13 +117,8 @@ pub fn cornell_box_test(t0: f64, t1: f64, aspect_ratio: f64) -> Scene {
     let box1 = RotateY::new(Arc::new(box1), 15.0);
     let box1 = Translate::new(Arc::new(box1), vec3(265.0, 0.0, 295.0));
 
-    let box2 = Box3D::new(
-        vec3(0.0, 0.0, 0.0),
-        vec3(165.0, 165.0, 165.0),
-        white.clone(),
-    );
-    let box2 = RotateY::new(Arc::new(box2), -18.0);
-    let box2 = Translate::new(Arc::new(box2), vec3(130.0, 0.0, 65.0));
+    let glass = Dielectric::new(1.5);
+    let sphere = Sphere::new(vec3(190.0, 90.0, 190.0), 90.0, glass.clone());
 
     let light = FlipFace::new(XzRect::new(213.0, 343.0, 227.0, 332.0, 554.0, light.clone()));
 
@@ -134,7 +131,7 @@ pub fn cornell_box_test(t0: f64, t1: f64, aspect_ratio: f64) -> Scene {
     world.add(wall4);
     world.add(wall5);
     world.add(box1);
-    world.add(box2);
+    world.add(sphere);
     world.add(light);
     return Scene {
         camera: camera,

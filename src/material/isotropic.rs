@@ -1,4 +1,3 @@
-use crate::color::{color, Color};
 use crate::hittable::HitRecord;
 use crate::material::{Material, MaterialType, Scatter};
 use crate::ray::Ray;
@@ -20,26 +19,18 @@ impl Isotropic {
 }
 
 impl Material for Isotropic {
-    fn scatter(&self, ray: &Ray, hit: &HitRecord, rng: &mut SmallRng) -> Option<Scatter> {
-        let scattered = Ray {
-            origin: ray.origin,
+    fn scatter(&self, rayin: &Ray, hit: &HitRecord, rng: &mut SmallRng) -> Option<Scatter> {
+        let ray = Ray {
+            origin: rayin.origin,
             direction: Vec3::random_in_unit_sphere(rng),
-            time: ray.time,
+            time: rayin.time,
         };
 
         let attenuation = self.albedo.value(hit.u, hit.v, hit.point);
         Some(Scatter {
-            scattered: scattered,
+            ray: ray,
             attenuation: attenuation,
-            pdf: 1.0,
+            pdf: None
         })
-    }
-
-    fn scattering_pdf(&self, _ray: &Ray, _hit: &HitRecord, _scattered: &Ray) -> f64 {
-        1.0
-    }
-
-    fn emitted(&self, _ray: &Ray, _hit: &HitRecord, _u: f64, _v: f64, _p: Vec3) -> Color {
-        return color(0.0, 0.0, 0.0);
     }
 }

@@ -1,5 +1,7 @@
 use crate::hittable::{aabb::Aabb, HitRecord, Hittable, Hittables};
 use crate::ray::Ray;
+use crate::vec::Vec3;
+use rand::prelude::*;
 use rand::rngs::SmallRng;
 
 #[derive(Debug, Clone)]
@@ -58,5 +60,20 @@ impl Hittable for HittableList {
             }
         }
         Some(temp_box)
+    }
+
+    fn pdf_value(&self, origin: Vec3, v: Vec3, rng: &mut SmallRng) -> f64 {
+        let weight = 1.0/(self.hittables.len() as f64);
+        let mut sum = 0.0;
+
+        for h in self.hittables.iter() {
+            sum += weight * h.pdf_value(origin, v, rng);
+        }
+         return sum;
+    }
+
+    fn random(&self, origin: Vec3, rng: &mut SmallRng) -> Vec3 {
+        let sz = self.hittables.len();
+        return self.hittables[rng.gen_range(0, sz)].random(origin, rng);
     }
 }

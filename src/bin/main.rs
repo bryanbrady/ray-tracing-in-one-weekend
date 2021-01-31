@@ -11,8 +11,9 @@ use std::sync::Arc;
 
 use rtlib::color::{color, write_color, Color};
 use rtlib::hittable::{Hittable, Hittables};
+use rtlib::hittable::hittable_list::HittableList;
 use rtlib::material::{Material, MaterialType};
-use rtlib::pdf::{CosinePdf, HittablePdf, MixturePdf, Pdf};
+use rtlib::pdf::{HittablePdf, MixturePdf, Pdf};
 use rtlib::ray::Ray;
 
 #[allow(unused_imports)]
@@ -40,7 +41,7 @@ const ASPECT_RATIO: f64 = 1.0;
 const IMAGE_WIDTH: u64 = 800;
 const IMAGE_HEIGHT: u64 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u64;
 const PIXELS: u64 = IMAGE_WIDTH * IMAGE_HEIGHT;
-const SAMPLES_PER_PIXEL: u64 = 1000;
+const SAMPLES_PER_PIXEL: u64 = 2000;
 const MAX_DEPTH: u32 = 50;
 
 #[allow(dead_code)]
@@ -60,20 +61,27 @@ fn ray_color(
             let emitted = hit.mat.emitted(&ray, &hit, hit.u, hit.v, hit.point);
             match hit.mat.scatter(&ray, &hit, rng) {
                 Some(scatter) => {
-                    let p0 = HittablePdf::new(hit.point, lights.clone());
-                    let p1 = CosinePdf::new(hit.normal);
-                    let pdf = MixturePdf::new(p0, p1);
-                    let scattered = Ray {
-                        origin: hit.point,
-                        direction: pdf.generate(rng),
-                        time: ray.time,
-                    };
-                    let pdf_val = pdf.value(scattered.direction, rng);
-                    return emitted
-                        + scatter.attenuation
-                            * hit.mat.scattering_pdf(&ray, &hit, &scattered)
-                            * ray_color(scattered, background, world, lights.clone(), depth - 1, rng)
-                            * (1.0 / pdf_val);
+                    match scatter.pdf {
+                        None => {
+                            return scatter.attenuation
+                                * ray_color(scatter.ray, background, world, lights.clone(), depth - 1, rng)
+                        },
+                        Some(pdf) => {
+                            let light_pdf = HittablePdf::new(hit.point, lights.clone());
+                            let pdf = MixturePdf::new(Arc::new(light_pdf), Arc::new(pdf));
+                            let scattered = Ray {
+                                origin: hit.point,
+                                direction: pdf.generate(rng),
+                                time: ray.time,
+                            };
+                            let pdf_val = pdf.value(scattered.direction, rng);
+                            return emitted
+                                + scatter.attenuation
+                                    * hit.mat.scattering_pdf(&ray, &hit, &scattered)
+                                    * ray_color(scattered, background, world, lights.clone(), depth - 1, rng)
+                                    * (1.0 / pdf_val);
+                        }
+                    }
                  }
                 None => {
                     return emitted;
@@ -99,12 +107,18 @@ fn main() -> Result<(), std::io::Error> {
 
     // Scene
     //let scene = cornell_box(time0, time1, ASPECT_RATIO);
-    let scene = cornell_box_test(time0, time1, ASPECT_RATIO);
-    let lights = Arc::new(XzRect::new(213.0, 343.0, 227.0, 332.0, 554.0, Arc::new(MaterialType::default())));
-    // let scene = random_world_original(time0, time1, ASPECT_RATIO);
+    // let scene = cornell_box_test(time0, time1, ASPECT_RATIO);
+    // let lights = Arc::new(XzRect::new(213.0, 343.0, 227.0, 332.0, 554.0, Arc::new(MaterialType::default())));
+    let scene = random_world_original(time0, time1, ASPECT_RATIO);
 
     // World
     let world = scene.hittables;
+    let mut lights = HittableList {
+        hittables: Vec::new(),
+    };
+    lights.add(XzRect::new(213.0, 343.0, 227.0, 332.0, 554.0, Arc::new(MaterialType::default())));
+    //lights.add(Sphere::new(Vec3::new(190.0, 90.0, 190.0), 90.0, Arc::new(MaterialType::default())));
+    let lights = Arc::new(Hittables::from(lights));
 
     // Camera
     let camera = scene.camera;

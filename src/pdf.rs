@@ -72,10 +72,10 @@ pub struct MixturePdf {
 }
 
 impl MixturePdf {
-    pub fn new(pdf1: PdfType, pdf2: PdfType) -> PdfType {
+    pub fn new(pdf1: Arc<PdfType>, pdf2: Arc<PdfType>) -> PdfType {
         PdfType::from(MixturePdf {
-            pdf1: Arc::new(pdf1),
-            pdf2: Arc::new(pdf2),
+            pdf1: pdf1,
+            pdf2: pdf2,
         })
     }
 }

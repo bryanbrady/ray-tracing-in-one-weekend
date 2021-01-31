@@ -1,10 +1,9 @@
 use crate::color::{color, Color};
 use crate::hittable::HitRecord;
-use crate::material::{Material, MaterialType, Scatter};
+use crate::material::{Material, MaterialType};
 use crate::ray::Ray;
 use crate::texture::{Texture, TextureColor};
 use crate::vec::Vec3;
-use rand::rngs::SmallRng;
 use std::sync::Arc;
 
 // Diffuse
@@ -20,14 +19,6 @@ impl Diffuse {
 }
 
 impl Material for Diffuse {
-    fn scatter(&self, _ray: &Ray, _hit: &HitRecord, _rng: &mut SmallRng) -> Option<Scatter> {
-        return None;
-    }
-
-    fn scattering_pdf(&self, _ray: &Ray, _hit: &HitRecord, _scattered: &Ray) -> f64 {
-        1.0
-    }
-
     fn emitted(&self, _ray: &Ray, hit: &HitRecord, u: f64, v: f64, p: Vec3) -> Color {
         if hit.front_face {
             return self.emit.value(u, v, p);
