@@ -3,18 +3,15 @@
 
 Why not learn about Ray Tracing and Rust at the same time?
 
-## Build
+## Usage
 ```bash
+# Build
 cargo build --release
-```
 
-## Run
-```bash
+# Run
 cargo run --release > image.ppm
-```
 
-## Profile
-```bash
+# Profile
 RUSTFLAGS=-g cargo run --features profile > image.ppm
 ```
 
