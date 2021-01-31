@@ -3,9 +3,6 @@
 
 Why not learn about Ray Tracing and Rust at the same time?
 
-This a rust implementation of 
-[_Ray Tracing in One Weekend Series_](https://raytracing.github.io/).
-
 ## Usage
 ```bash
 # Build
