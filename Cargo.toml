@@ -8,14 +8,15 @@ default-run = "main"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rand = "0.7"
-threadpool = "1.8.1"
-num_cpus = "1.13.0"
+cpuprofiler = { version = "0.0.4", optional = true }
 enum_dispatch = "0.3.4"
 image = "0.23.12"
-cpuprofiler = { version = "0.0.4", optional = true }
 indicatif = {version = "0.15.0", features = ["rayon"]}
+num_cpus = "1.13.0"
+rand = "0.7"
 rayon = "1.5.0"
+structopt = "0.3.21"
+threadpool = "1.8.1"
 
 [features]
 default = ["rand/small_rng"]

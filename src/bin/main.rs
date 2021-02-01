@@ -8,6 +8,7 @@ use rayon::iter::ParallelIterator;
 use rayon::prelude::*;
 use std::io::{self};
 use std::sync::Arc;
+use structopt::StructOpt;
 
 use rtlib::color::{color, write_color, Color};
 use rtlib::hittable::{Hittable, Hittables};
@@ -17,21 +18,20 @@ use rtlib::ray::Ray;
 
 #[allow(unused_imports)]
 use rtlib::scenes::{
-    cornell_box::cornell_box, cornell_box::cornell_box_sphere, cornell_smoke::cornell_smoke,
-    next_week_final::next_week_final, perlin::marble, perlin::noise, perlin::turbulence,
-    random_world::random_world, random_world::random_world_checkered,
-    random_world::random_world_earth, random_world::random_world_original,
-    rotate_test::rotate_test, simple_light::simple_light,
+    cornell_box::cornell_box,
+    cornell_box::cornell_box_sphere,
+    cornell_smoke::cornell_smoke,
+    next_week_final::next_week_final,
+    perlin::marble,
+    perlin::noise,
+    perlin::turbulence,
+    random_world::random_world,
+    random_world::random_world_checkered,
+    random_world::random_world_earth,
+    random_world::random_world_original,
+    rotate_test::rotate_test,
+    simple_light::simple_light,
 };
-
-// Image
-const ASPECT_RATIO: f64 = 1.0;
-// const ASPECT_RATIO: f64 = 16.0 / 9.0;
-const IMAGE_WIDTH: u64 = 400;
-const IMAGE_HEIGHT: u64 = ((IMAGE_WIDTH as f64) / ASPECT_RATIO) as u64;
-const PIXELS: u64 = IMAGE_WIDTH * IMAGE_HEIGHT;
-const SAMPLES_PER_PIXEL: u64 = 200;
-const MAX_DEPTH: u32 = 50;
 
 #[allow(dead_code)]
 fn ray_color(
@@ -82,7 +82,34 @@ fn ray_color(
     }
 }
 
+#[derive(StructOpt, Debug)]
+#[structopt(name = "basic")]
+struct Opt {
+    #[structopt(short, long, default_value = "400")]
+    width: u64,
+
+    #[structopt(short, long, default_value = "100")]
+    samples: u64,
+
+    #[structopt(short, long, default_value = "1.0")]
+    aspect_ratio: f64,
+
+    #[structopt(short, long, default_value = "50")]
+    depth: u32,
+
+    #[structopt(short, long, default_value = "random_world")]
+    scene: String,
+}
+
 fn main() -> Result<(), std::io::Error> {
+    let opt = Opt::from_args();
+    let aspect_ratio = opt.aspect_ratio;
+    let image_width = opt.width;
+    let image_height = ((image_width as f64) / aspect_ratio) as u64;
+    let num_pixels = image_width * image_height;
+    let samples_per_pixel = opt.samples;
+    let max_depth = opt.depth;
+
     rayon::ThreadPoolBuilder::new()
         .num_threads(num_cpus::get() - 1)
         .build_global()
@@ -101,9 +128,22 @@ fn main() -> Result<(), std::io::Error> {
     let (time0, time1) = (0.0, 1.0);
 
     // Scene
-    // let scene = cornell_box(time0, time1, ASPECT_RATIO);
-    // let scene = random_world_original(time0, time1, ASPECT_RATIO);
-    let scene = cornell_box_sphere(time0, time1, ASPECT_RATIO);
+    let scene = match opt.scene.as_ref() {
+        "cornell_box" => cornell_box(time0, time1, aspect_ratio),
+        "cornell_box_sphere" => cornell_box_sphere(time0, time1, aspect_ratio),
+        "cornell_smoke" => cornell_smoke(time0, time1, aspect_ratio),
+        "next_week_final" => next_week_final(time0, time1, aspect_ratio),
+        "marble" => marble(time0, time1, aspect_ratio),
+        "noise" => noise(time0, time1, aspect_ratio),
+        "turbulence" => turbulence(time0, time1, aspect_ratio),
+        "random_world" => random_world(time0, time1, aspect_ratio),
+        "random_world_checkered" => random_world_checkered(time0, time1, aspect_ratio),
+        "random_world_earth" => random_world_earth(time0, time1, aspect_ratio),
+        "random_world_original" => random_world_original(time0, time1, aspect_ratio),
+        "rotate_test" => rotate_test(time0, time1, aspect_ratio),
+        "simple_light" => simple_light(time0, time1, aspect_ratio),
+        _ => random_world(time0, time1, aspect_ratio),
+    };
 
     // World
     let world = scene.hittables;
@@ -114,7 +154,7 @@ fn main() -> Result<(), std::io::Error> {
     let background = camera.background;
 
     // Progress Bar
-    let bar = ProgressBar::new(PIXELS);
+    let bar = ProgressBar::new(num_pixels);
     bar.set_style(
         ProgressStyle::default_bar()
             .template("[{elapsed_precise}] {wide_bar} {pos:>7}/{len:7} {msg}"),
@@ -122,28 +162,28 @@ fn main() -> Result<(), std::io::Error> {
 
     // Do it
     eprintln!("Tracing rays....");
-    let pixels: Vec<Color> = (0..PIXELS)
+    let pixels: Vec<Color> = (0..num_pixels)
         .into_par_iter()
         .progress_with(bar)
         .map_init(SmallRng::from_entropy, |rng, i| {
-            let h = IMAGE_HEIGHT - (i / IMAGE_WIDTH) - 1;
-            let w = i % IMAGE_WIDTH;
+            let h = image_height - (i / image_width) - 1;
+            let w = i % image_width;
             let mut pixel_color = color(0.0, 0.0, 0.0);
-            for _i in 0..SAMPLES_PER_PIXEL {
+            for _i in 0..samples_per_pixel {
                 let ur: f64 = rng.gen();
                 let vr: f64 = rng.gen();
-                let u: f64 = ((w as f64) + ur) / ((IMAGE_WIDTH - 1) as f64);
-                let v: f64 = ((h as f64) + vr) / ((IMAGE_HEIGHT - 1) as f64);
+                let u: f64 = ((w as f64) + ur) / ((image_width - 1) as f64);
+                let v: f64 = ((h as f64) + vr) / ((image_height - 1) as f64);
                 let r = camera.get_ray(u, v, rng);
-                pixel_color += ray_color(r, background, &world, lights.clone(), MAX_DEPTH, rng);
+                pixel_color += ray_color(r, background, &world, lights.clone(), max_depth, rng);
             }
             pixel_color
         })
         .collect();
 
-    println!("P3\n{} {}\n255", IMAGE_WIDTH, IMAGE_HEIGHT);
+    println!("P3\n{} {}\n255", image_width, image_height);
     for pixel in pixels {
-        write_color(&mut io::stdout(), pixel, SAMPLES_PER_PIXEL).expect("Unable to write data");
+        write_color(&mut io::stdout(), pixel, samples_per_pixel).expect("Unable to write data");
     }
 
     eprintln!("Done!\n");
